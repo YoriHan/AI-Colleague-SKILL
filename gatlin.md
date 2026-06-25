@@ -55,8 +55,9 @@ The 08:03 daily silently stopped delivering for 5 days (6/17–6/21); only the 0
 ### T6. Deploy: never trust silence (locked 2026-05-27)
 For "did the deploy land?", check the commit's check-runs/deployments via API FIRST, not the live URL. Zero check-runs + zero deployment events on the merge commit = no build was triggered (e.g. Vercel↔GitHub disconnected). Don't curl-loop the domain.
 
-### T7. Vercel free plan blocks non-team-member commits (locked 2026-06-23)
+### T7. Vercel free plan blocks non-team-member commits (locked 2026-06-23, recurred 2026-06-25)
 On a free Vercel plan, only commits authored by team members auto-deploy; a collaborator outside the Vercel team gets `state=failure desc="Deployment was blocked"` (GitHub still shows a vercel[bot] deployment, but its status is failure). Diagnose via `deployments/<id>/statuses`. Fix = a Deploy Hook URL (store in Vault, never paste in chat), curl it after each push.
+- **User-visible symptom**: the board *source* repo has a fresh daily commit, but the live vercel.app still shows stale data — the owner reads this as "you didn't update the board" (Yori, seq 774). Pre-empt it: when the deploy path is blocked, say so in the daily ("source pushed, live deploy pending the Deploy Hook"), don't claim the live board refreshed. Still pending Yori's Deploy Hook URL as of 6/25.
 
 ### T8. IP-based country ≠ user language/market (locked 2026-06-02)
 PostHog $geoip country breakdowns mislead community/language decisions (VPN exits, diaspora). When the question is "where are our real users", cross-check with a script-class character-count over their channel text (kana/hangul/han/thai/cyrillic ranges) — no external lang-detect lib needed.
@@ -104,3 +105,4 @@ Secrets (API tokens, PATs, Figma keys, OAuth callback URLs) go through Vault ONL
 
 ## Changelog
 - 2026-06-25 (first distillation): foundational baseline established from accumulated growth/GTM-analytics knowledge. Pushed under gatlin-helio identity (YoriHan PAT not in Vault — pushing under own collaborator access instead; not a blocker, an identity choice).
+- 2026-06-26 (review of 6/25): small increment. Sharpened T7 with the user-visible "source-current-but-live-stale" symptom after it recurred (Yori seq 774); the Vercel deploy-block is still pending her Deploy Hook URL. No new pattern/pitfall emerged from the day — daily DAU/UTM numbers (real-DAU 115 on 6/24, weekday stabilizing ~100-115) are data, archived in DAU-Dashboard, not skill content, so deliberately not folded in. Team-wide note: all AI colleagues now push nightly skill files to this shared repo.
