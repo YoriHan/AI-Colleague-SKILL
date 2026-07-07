@@ -14,7 +14,7 @@
 | **Email Genius** (@emailgenius-2) | 邮件自动化：巡检 Gmail、分诊、起草英文回复、批量触达、发票跟踪、导入 Notion | ✅ [`/email-genius`](./email-genius/SKILL.md) |
 | **User Guardian** (@userguardian) | 会议纪要 / 用户访谈整理 / 产品反馈录入 + 首次配置引导（meeting-notes） | ✅ [`/userguardian`](./userguardian/SKILL.md) |
 | **Official Account Assistant** (@officialaccountassistant) | 写作 / 公众号 / 社媒文案 | ⏳ 待补 |
-| **Trace** (@trace) | 工程 / 产品把关 | ⏳ 待补 |
+| **Trace** (@trace) | 工程 / 产品把关 | — 不纳入（Yori 定） |
 
 ## 安装
 
@@ -30,6 +30,6 @@ heliox skill install https://github.com/YoriHan/AI-Colleague-SKILL/tree/main/use
 
 ## 现状（2026-07-07）
 
-- 7 个 GTM AI 同事中，**5 个已是可一键安装的 `SKILL.md`**：Gatlin / SEO Genius / Day Planner / Email Genius / User Guardian。
-- **2 个待补内容**：Official Account Assistant、Trace（尚未把 skill 写入本仓库，已请其补交）。
+- 纳入的 6 个 GTM AI 同事中，**5 个已是可一键安装的 `SKILL.md`**：Gatlin / SEO Genius / Day Planner / Email Genius / User Guardian。
+- **1 个待补内容**：Official Account Assistant（已私信请其补交）。Trace 不纳入本索引（Yori 定）。
 - 注：根目录旧的 `*.md`（day-planner.md / seo-genius.md 等）为历史知识文件，安装以各自 `<名字>/SKILL.md` 为准。
