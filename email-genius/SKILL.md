@@ -5,7 +5,7 @@ description: 邮件自动化技能 — 巡检 Gmail、分诊来件、起草英�
 
 # email-genius.md
 **Email Genius — Skill File**
-*AI Colleague Skill | Last updated: 2026-07-08 00:00 JST (v11 — Days 15-16 lessons: open-tracking warm signal, duplicate reply-thread handling, small creator invoices)*
+*AI Colleague Skill | Last updated: 2026-07-10 00:00 JST (v13 — day 18 lessons: payment method impasse pattern, post-agreement thread staleness rule, product-hold reactivation template confirmed, multi-invoice accumulation normalization)*
 
 ---
 
@@ -77,50 +77,58 @@ Draft Board is a local web UI at `http://localhost:5001` for reviewing and sendi
 
 ---
 
-### Step 4 — Create Your 3 Automated Schedules
+### Step 4 — Create Your 3 Automations
 
 This is the automation core. Before creating anything:
 
 **Pre-flight (required):**
-1. Confirm your timezone from Step 0 — I'll set `--tz` to match on every cron
-2. Check for duplicates: `heliox schedule list --type cron --limit 100 --json` — duplicate crons run silently twice
+1. Confirm your timezone from Step 0 — pass it as `--timezone` on every `automation create`
+2. Check for duplicates: `heliox automation list --json` — duplicate automations run silently twice
+3. Automations are created **disabled** — run `heliox automation update <id> --enable true` after each create
+4. `--timezone` is set at create time only — wrong timezone requires delete and recreate
 
-**Schedule A — Gmail Patrol (every 3 hours, 8×/day)**
+**Automation A — Gmail Patrol (every 3 hours, 8×/day)**
 ```bash
-heliox schedule create "Gmail 三小时邮件巡查" \
+heliox automation create "Gmail 三小时邮件巡查" \
   --cron "0 0,3,6,9,12,15,18,21 * * *" \
-  --tz "<your-timezone>" \
-  -d "Scan Gmail inbox every 3 hours. Triage emails, draft KOL replies, log invoices, send DM patrol report." \
+  --timezone "<your-timezone>" \
+  --procedure "Scan Gmail inbox every 3 hours. Triage emails, draft KOL replies, log invoices. Post patrol report to <report-channel-from-Step-0> with heliox message send." \
   --json
+# Created DISABLED — activate:
+heliox automation update <id-A> --enable true
 ```
 
-**Schedule B — KOL Price Scan (daily, your morning hour)**
+**Automation B — KOL Price Scan (daily, your morning hour)**
 ```bash
-heliox schedule create "KOL Reply Price Scan" \
+heliox automation create "KOL Reply Price Scan" \
   --cron "0 <hour> * * *" \
-  --tz "<your-timezone>" \
-  -d "Scan for new KOL pricing replies. Extract rates, update Notion KOL database, send DM with results." \
+  --timezone "<your-timezone>" \
+  --procedure "Scan for new KOL pricing replies. Extract rates, update Notion KOL database. Post results to <report-channel-from-Step-0> with heliox message send." \
   --json
+# Created DISABLED — activate:
+heliox automation update <id-B> --enable true
 ```
 
-**Schedule C — PayPal Invoice Summary (daily, your midday hour)**
+**Automation C — PayPal Invoice Summary (daily, your midday hour)**
 ```bash
-heliox schedule create "PayPal Invoice 待支付汇总" \
+heliox automation create "PayPal Invoice 待支付汇总" \
   --cron "0 <hour> * * *" \
-  --tz "<your-timezone>" \
-  -d "Scan for outstanding PayPal invoices. Cross-reference payment confirmations, extract payment links, send DM with pending invoice table." \
+  --timezone "<your-timezone>" \
+  --procedure "Scan for outstanding PayPal invoices. Cross-reference payment confirmations, extract payment links. Post pending invoice table to <report-channel-from-Step-0> with heliox message send." \
   --json
+# Created DISABLED — activate:
+heliox automation update <id-C> --enable true
 ```
 
-After creating each schedule, **save the returned schedule ID**. Then verify each one:
+After creating and enabling each automation, **save the returned automation ID**. Then verify all three:
 
 ```bash
-heliox schedule show <id-A> --json
-heliox schedule show <id-B> --json
-heliox schedule show <id-C> --json
+heliox automation show <id-A> --json
+heliox automation show <id-B> --json
+heliox automation show <id-C> --json
 ```
 
-Check: `timezone` matches yours, `next_run_at` is in the future. This confirms **created / scheduled** — not yet running. Status moves to **Running** only after the first confirmed run record arrives.
+Check: `timezone` matches yours, `next_run_at` is in the future, `enabled: true`. This confirms **created / enabled** — not yet running. Status moves to **Running** only after the first confirmed run record arrives.
 
 ---
 
@@ -155,7 +163,7 @@ If the patrol fails, I'll tell you exactly what's broken and how to fix it.
 
 ### Step 7 — You're Live
 
-Once Step 6 succeeds, the 3 schedules take over. Day-one routine:
+Once Step 6 succeeds, the 3 automations take over. Day-one routine:
 
 | Time (your timezone) | What arrives in your DM |
 |---|---|
@@ -177,8 +185,8 @@ Once Step 6 succeeds, the 3 schedules take over. Day-one routine:
 | How do I add an ignore rule? | "Ignore emails from [sender/domain] permanently" |
 | Gmail token expired — what do I do? | Tell me "Gmail token expired" — I'll send you a new auth card to click |
 | Where do I find my drafts? | http://localhost:5001 or Gmail → Drafts |
-| How do I pause the patrol? | `heliox schedule update <id> --enabled false` |
-| What are my schedule IDs? | `heliox schedule list --json` |
+| How do I pause the patrol? | `heliox automation update <id> --enable false` |
+| What are my automation IDs? | `heliox automation list --json` |
 | Can I change the 50% counter-offer rate? | Tell me your preferred rate — I'll remember it |
 | What emails does Email Genius skip by default? | Platform notifications (Notion, Google, Figma, Slack), newsletters, confirmed mass senders |
 | I'm not in Tokyo timezone — does that matter? | Tell me your timezone once; I'll adjust all schedule descriptions and report headers |
@@ -214,11 +222,6 @@ KOL status categories:
 - **Waiting on partner reply** — we've replied, waiting for them
 - **Product-hold** — collab approved by both sides, paused until our product readiness (e.g. UI update). No action from Yori needed; note in report and track separately. Resume as soon as Yori gives product go-ahead.
 
-Outbound open tracking
-- Treat Gmail open-tracking bursts as a warm engagement signal.
-- If an outbound KOL/partner email shows 6+ opens in a short window, surface immediately as: `[WARM] [KOL] opened outreach N times — likely reply incoming.`
-- Do not wait for the actual reply before flagging unusually high engagement.
-
 Invoice / payment
 - Log each invoice with sender name, amount, invoice number, and status (internal Notion only)
 - Track PayPal confirmation — confirmed payment = closed, update Notion status
@@ -240,6 +243,11 @@ Auto-skip types (no DM mention needed unless something unusual):
 
 Cal.com / meeting bookings
 - DM immediately on keyword match; do not hold for next patrol
+
+Outbound open tracking
+- If Gmail signals 6+ opens of an outbound email in a short window, surface in patrol report as "[WARM] [KOL name] opened outreach email N times — likely reply incoming"
+- Surface immediately, do not wait for the actual reply
+- GMass double-notification caveat: two open notifications arriving within 8-10 seconds from the same recipient = one physical open event triggering two pixels (email client pre-fetch or caching). Do not count as 2 separate opens. Only surface as warm signal when: (a) opens span >30 minutes apart, or (b) single open from a contact silent for 14+ days on an outbound email
 
 6-hour unreplied check (layered on each patrol)
 - Surface emails older than 6h with no reply; list separately in the DM
@@ -317,7 +325,7 @@ Apply this before any post that could end up in a public repo.
 
 ---
 
-## Automated Tasks (as of 2026-06-29)
+## Automated Tasks (as of 2026-07-06)
 
 | Task | Cadence | Status |
 |------|---------|--------|
@@ -364,13 +372,57 @@ Budget reference (approximate, adjust per channel size):
 
 ## Lessons Learned
 
+**Day 18 (2026-07-09 → 2026-07-10):**
+
+Payment method impasse as a distinct stall pattern: A KOL partner thread stalled at 31+ days because the partner refused PayPal and offered only wire transfer or crypto. This is not a "waiting on reply" stall — both sides are actively responsive but blocked on payment terms. Rule: when a partner explicitly states they don't accept PayPal and offers only wire/crypto, flag immediately as "payment method mismatch" and surface as a Yori decision item. Aging beyond 7 days without resolution = flag as overdue impasse in every subsequent patrol with a day count. Don't hold silently alongside normal unreplied items.
+
+Post-agreement thread staleness rule: A KOL negotiation that reached full agreement on both sides (budget aligned, format confirmed for a dedicated YouTube video) went silent for 45+ days — no contract, no next-step email from either side. Rule: after a KOL agreement is confirmed (budget and format both accepted), if no contract or concrete next-step email is exchanged within 7 days, flag as "stalled post-agreement (day N)" in patrol reports and surface for Yori to send a nudge. Post-agreement silence is as actionable as no-reply to initial outreach. This is distinct from product-hold (where the pause is intentional) — here neither side moved.
+
+Product-hold reactivation template confirmed: A product-hold KOL (product-hold since July 3) was reactivated by Yori sending the July collaboration kit + Notion link directly to the partner's contact. The confirmed reactivation format: (1) brief acknowledgement of the wait, (2) confirm product is live and ready, (3) share the latest collab kit URL, (4) ask them to proceed or re-send any script/contract details. This matches the Days 11-14 pattern — now confirmed as the standard. When reactivating, check that the collab kit URL is the current month's version.
+
+Multiple small invoices per patrol window is now normal: a small payment confirmation (invoice closed) and a new small incoming invoice (invoice number present) arrived in the same patrol window from different KOL vendors. This is expected as the KOL program scales. Log each individually with vendor, amount, invoice number, and status. Keep invoice table in the DM report visually separate from KOL negotiation status rows — they serve different purposes and shouldn't be merged.
+
+**Day 17 (2026-07-08 → 2026-07-09):**
+
+Support-ticket merge = duplicate outreach signal: When a KOL routes email through a helpdesk (e.g. Zendesk), a second outreach email from a later batch creates a new ticket. Their team merges it into the original ("Request #XXXX was closed and merged into this request"). This notification lands in the original thread. Rule: merge notification = confirm duplicate outreach occurred. The active thread is the older/merged-into one. No new reply needed unless the contact initiates. Log in Notion as "duplicate outreach — merged into original thread."
+
+Pre-batch domain cross-check via Gmail sent: A creator was already mid-conversation (existing June thread) but got re-outreached on July 8 because CSV deduplication only runs within the current batch and Notion. Add a Gmail sent-folder check before finalizing each batch: search `to:<address> in:sent newer_than:90d` for each recipient. If a sent match exists, pull the thread — if there's already a reply, skip that contact from the batch.
+
+"Not familiar with AI tools" inquiry pattern: Contact replied with curiosity but needs product education before they can evaluate fit. This is a warm lead, not a decline. Response template: (1) brief acknowledgement, (2) spell out the format (video length + what they'd do on camera), (3) explain the audience fit hypothesis, (4) give budget range, (5) ask for their rate card. 5–6 short bullets total; no walls of text.
+
+GMass double-notification false positive: Two open-tracking emails arriving within 8–10 seconds from the same recipient = one physical open event triggering two pixels (email client pre-fetch or caching). Do not surface as "opened 2×" or count toward the 6-open warm-signal threshold. (Updated in Core Operating Patterns above.)
+
+Delivery bounce — domain typo: A bounce with "domain couldn't be found" (e.g. "example.comcon") usually means a data-entry typo in the outreach CSV. Extract the probable correct domain (strip the typo suffix), note in patrol report so Yori can retry with the corrected address. Never re-send automatically from a bounced address.
+
 **Days 15-16 (2026-07-07 → 2026-07-08):**
 
-Email open tracking as warm signal: when Gmail shows 6+ opens of an outbound email in a short window, surface immediately as `[WARM] [KOL] opened outreach N times — likely reply incoming.` Do not wait for the reply to flag engagement.
+Email open tracking as warm signal: When Gmail shows an outbound email opened 6+ times in a concentrated window (e.g. 3–4 minutes), surface immediately in the patrol report as "[WARM] [KOL] opened outreach email N times — likely reply incoming." This helps Yori know a reply is probable before it arrives. Do not wait for the actual reply to flag engagement.
 
-Duplicate outreach → duplicate reply threads: if the same contact was emailed twice within minutes from the same batch, both threads can receive identical replies. Flag both, recommend replying to the most recent thread only, mark the earlier one stale, and do not draft two separate counter-offers to the same person.
+Duplicate outreach → duplicate reply threads: If the same KOL contact was accidentally emailed twice within a few minutes (same batch, different send calls), both threads can receive identical replies. When this is detected in the patrol, flag both threads, recommend replying to the most recent one only, and note the earlier thread as stale. Do not draft two separate counter-offers to the same contact.
 
-Small creator invoices ($20–$100): use the same Notion logging workflow as larger invoices. No special handling needed for smaller amounts.
+Small creator invoices ($20–$100): Handled identically to larger invoices — log to Notion with sender, amount, invoice number, and status. PayPal confirmation closes the entry. No special handling needed just because the amount is small.
+
+**Days 11-14 (2026-07-03 → 2026-07-06):**
+
+Long-overdue invoice resolved: A KOL vendor invoice (17+ days overdue, flagged in 3+ consecutive patrols) was finally paid via PayPal confirmation. When a payment confirmation arrives, close that item from patrol reports immediately and update Notion status to paid. Day-count persistence in reports is effective — continue it.
+
+New KOL decline type — sponsor volume capacity: A partner declined due to already managing too many sponsors (not budget or audience fit). Response: acknowledge gracefully, express interest for future opportunities, keep door open. Log in Notion as "declined – capacity."
+
+Product-hold KOL reactivation: When product update completes, draft a brief restart email: (1) acknowledge the delay, (2) confirm product is live and filming can proceed, (3) ask them to re-send script / contract details. Use Gmail draft approach; don't auto-send.
+
+Above-budget multichannel KOL: One KOL quoted $2,000 dedicated / $1,500 reel across 4 platforms — 2× above the $1,000 budget ceiling. Surface immediately with subscriber count, format breakdown, and "above budget — needs Yori's call" flag. Do not draft a counter until Yori decides.
+
+Vendor second billing: A vendor sent a second billing notice for a pending invoice. Note in patrol report as "second billing received, N days outstanding" — makes escalation visible without special action. Continue day-count tracking until resolved.
+
+Expansion scope discussion (pending): Yori raised interest in expanding Email Genius scope to cover product user emails (onboarding / activation sequences). Direction unconfirmed as of Jul 6. Skill file will update once clarified.
+
+**Day 10 (2026-06-30):**
+
+heliox email backend down (exit 6): When `heliox email send` or `list` returns exit 6, the backend is unavailable. Fallback: use Gmail MCP `create_draft` to build N drafts in the connected Gmail inbox with all fields filled (To, Subject, Body). Human reviews the drafts in Gmail → Drafts folder and batch-sends. This naturally satisfies any "human review before send" gate and avoids blocking on a broken backend.
+
+1V1 outreach via Gmail draft approach: For any bulk outreach campaign requiring human review before send, the Gmail draft approach is the default path. Create all drafts, surface the count and folder location in the DM, wait for Yori's send confirmation. Never auto-send from an outreach batch.
+
+skill ≠ install-time wizard (full team, 2026-06-30, seq 616–626): This skill file is a passive capability doc. When a new user installs it, nothing fires automatically — no heliox commands, no auth cards, no schedule creation. The First-Run Setup wizard in this file only runs if the runtime emits a `skill:install` wake event (a platform-level gap as of 2026-06-30). Until that hook exists, users must explicitly ask to be guided through setup. Do not claim the skill guides users "from 0 to 1 automatically."
 
 **Day 9 (2026-06-29):**
 
@@ -433,4 +485,4 @@ subprocess shell safety: subprocess.run shell=False for all generated prose in h
 - Verify Gmail tool connection before each patrol
 - Draft board: localhost:5001 (local session, not a public URL)
 - Notion: verify connection before import runs
-- Check cron IDs: heliox schedule show <id> before reporting "running" status for any automation
+- Check automation IDs: heliox automation show <id> before reporting "running" status for any automation
