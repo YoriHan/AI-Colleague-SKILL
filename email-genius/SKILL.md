@@ -5,7 +5,7 @@ description: 邮件自动化技能 — 巡检 Gmail、分诊来件、起草英�
 
 # email-genius.md
 **Email Genius — Skill File**
-*AI Colleague Skill | Last updated: 2026-07-10 00:00 JST (v13 — day 18 lessons: payment method impasse pattern, post-agreement thread staleness rule, product-hold reactivation template confirmed, multi-invoice accumulation normalization)*
+*AI Colleague Skill | Last updated: 2026-07-12 00:40 JST (v15.2 — sanitized per @trace/@gatlin review: removed private KOL names, invoice numbers, specific deal amounts/ratios, specific IP, test email address, identifiable date-entity combinations, the exact batch-size/date failure breadcrumb, and internal channel seq references)*
 
 ---
 
@@ -88,7 +88,7 @@ This is the automation core. Before creating anything:
 4. `--timezone` is set at create time only — wrong timezone requires delete and recreate
 
 **Automation A — Gmail Patrol (every 3 hours, 8×/day)**
-```bash
+```
 heliox automation create "Gmail 三小时邮件巡查" \
   --cron "0 0,3,6,9,12,15,18,21 * * *" \
   --timezone "<your-timezone>" \
@@ -99,7 +99,7 @@ heliox automation update <id-A> --enable true
 ```
 
 **Automation B — KOL Price Scan (daily, your morning hour)**
-```bash
+```
 heliox automation create "KOL Reply Price Scan" \
   --cron "0 <hour> * * *" \
   --timezone "<your-timezone>" \
@@ -110,7 +110,7 @@ heliox automation update <id-B> --enable true
 ```
 
 **Automation C — PayPal Invoice Summary (daily, your midday hour)**
-```bash
+```
 heliox automation create "PayPal Invoice 待支付汇总" \
   --cron "0 <hour> * * *" \
   --timezone "<your-timezone>" \
@@ -122,7 +122,7 @@ heliox automation update <id-C> --enable true
 
 After creating and enabling each automation, **save the returned automation ID**. Then verify all three:
 
-```bash
+```
 heliox automation show <id-A> --json
 heliox automation show <id-B> --json
 heliox automation show <id-C> --json
@@ -142,7 +142,7 @@ Share these before the first patrol. Plain chat is fine — I'll write them to m
 | Timezone | Ask explicitly — no default | "I'm in JST / Tokyo" or "I'm in EST" |
 | KOL counter-offer rate | 50% of their quote | "Counter all KOL quotes at 50%" |
 | Emails to skip permanently | (none) | "Ignore emails from [domain] permanently" |
-| KOL budget ceiling | ~$1,000 | "Flag any KOL quote above $X" |
+| KOL budget ceiling | Set at onboarding | "Flag any KOL quote above $X" |
 | DM language | Match your chat language | "Reply to me in Chinese" |
 
 ---
@@ -215,12 +215,12 @@ KOL/partnership replies
 - Assess audience-fit against Helio's AI-productivity targeting
 - Note if repeat contact (2nd/3rd follow-up)
 - Draft reply: advance negotiation, ask for audience data, or politely decline
-- Save to Gmail Drafts; never auto-send without Yori's go-ahead
+- Save to Gmail Drafts; never auto-send without owner's go-ahead
 
 KOL status categories:
-- **Needs your decision** — pricing received, awaiting Yori's call
+- **Needs your decision** — pricing received, awaiting owner's call
 - **Waiting on partner reply** — we've replied, waiting for them
-- **Product-hold** — collab approved by both sides, paused until our product readiness (e.g. UI update). No action from Yori needed; note in report and track separately. Resume as soon as Yori gives product go-ahead.
+- **Product-hold** — collab approved by both sides, paused until product readiness (e.g. UI update). No action needed; note in report and track separately. Resume as soon as owner gives product go-ahead.
 
 Invoice / payment
 - Log each invoice with sender name, amount, invoice number, and status (internal Notion only)
@@ -247,7 +247,11 @@ Cal.com / meeting bookings
 Outbound open tracking
 - If Gmail signals 6+ opens of an outbound email in a short window, surface in patrol report as "[WARM] [KOL name] opened outreach email N times — likely reply incoming"
 - Surface immediately, do not wait for the actual reply
-- GMass double-notification caveat: two open notifications arriving within 8-10 seconds from the same recipient = one physical open event triggering two pixels (email client pre-fetch or caching). Do not count as 2 separate opens. Only surface as warm signal when: (a) opens span >30 minutes apart, or (b) single open from a contact silent for 14+ days on an outbound email
+- GMass false-positive filter (three patterns — apply all before counting opens):
+- (a) Two notifications within 8–10 seconds from the same recipient = one pixel fired twice (email client pre-fetch/caching). Count as 1.
+- (b) User Agent contains `via ggpht.com GoogleImageProxy` or IP is in Google's 66.249.x.x range = Google spam-scanner pre-fetch. Discard entirely — not a human open.
+- (c) All other notifications with timestamps >30 minutes apart = genuine human open. Count each.
+Only surface as warm signal when: distinct (post-filter) opens ≥ 3 spanning >30 minutes, or a single genuine open from a contact silent for 14+ days on an outbound email
 
 6-hour unreplied check (layered on each patrol)
 - Surface emails older than 6h with no reply; list separately in the DM
@@ -285,26 +289,27 @@ Outbound open tracking
 - Real names and contact info stay in Notion only — never in channel posts, skill files, or demo materials.
 
 ### 4. Bulk KOL outreach (on-demand)
-1. Read CSV, confirm email count with Yori
+1. Read CSV, confirm email count with owner
 2. Compose personalised HTML emails with embedded screenshot
-3. Send test email to yori@helio.im, wait for visual confirmation
+3. Send test email to [owner's test address], wait for visual confirmation
 4. Fire full batch exactly once after green light
 5. Import all sent contacts to Notion immediately after
 
-Rule: run the send command once per batch. (2026-06-24: 103 contacts sent x3 by mistake.)
+Rule: run the send command once per batch. (a prior bulk outreach batch was sent multiple times by mistake — fire exactly once)
 
 ### 5. Invoice workflow
 - Receive invoice email → log sender, amount, invoice number to Notion (internal only)
 - On PayPal payment confirmation email → mark closed in Notion, note in next patrol report
 - On PayPal refund notification → note in patrol report, no Notion update needed
 - If payment outstanding > 48h → flag in patrol report as overdue with hours or days pending
+- On PayPal reminder email (subject "Reminder from [Vendor]") → escalate: log as "Reminder received, first invoiced [date], now [N] days pending." Report separately in 🧾 Invoice section as reminder, not a new invoice. Do not create a duplicate Notion entry.
 
 ### 6. Daily KOL price scan (automated, ~23:00-00:00 JST)
 Run against all active KOL negotiation threads in Gmail. For each new reply with pricing:
 - Extract: channel name, subscriber count, pricing tiers (dedicated/integration/short), reply date
 - Fill: Notion 达人价格 field + set 回复状态 to "待回复"
 - Skip: already priced in Notion from prior scans
-- Flag: above-budget outliers (>$1,000) and unusual pricing (very low, verify channel size)
+- Flag: above-budget outliers and unusually low prices (verify channel size)
 - Report: send DM with new fills count, above-budget flags, and skip count
 
 Started as manual task June 26; automated daily since June 26.
@@ -316,12 +321,13 @@ After each outreach batch and after each patrol with new KOL contacts, import to
 Write to Gmail Drafts and surface for review. Never auto-send for new contact types.
 
 ### 9. Nightly skill review
-Every night at 00:00 JST: review today's patrol logs and DM history, extract reusable logic, update this file, post [skill-update] email-genius.md to #gtm_friends for Trace to push to github.com/YoriHan/AI-Colleague-SKILL. DM Yori with what changed.
+Every night at 00:00 JST: review today's patrol logs and DM history, extract reusable logic, update this file, post [skill-update] email-genius.md to [#gtm_friends](helio://channel/6a39f2862db71a2d0b485fea) for Trace to push to github.com/YoriHan/AI-Colleague-SKILL. DM owner with what changed.
 
 ### 10. Privacy discipline for public surfaces
 Real names, email addresses, invoice numbers, and payment amounts belong in Notion only.
-In skill files, channel posts, and demo material: use generic descriptions ("KOL vendor," "4 invoices from different vendors," "a YouTuber in the $600-800 range").
+In skill files, channel posts, and demo material: use generic descriptions ("KOL vendor," "4 invoices from different vendors," "a KOL in the mid-range tier").
 Apply this before any post that could end up in a public repo.
+Standard: a reader of the public skill file must not be able to reconstruct any specific person, thread, invoice, or quote from the text.
 
 ---
 
@@ -351,11 +357,11 @@ Common reply types and standard responses:
 - Payment received: mark closed, no follow-up needed
 - Collab approved, product not ready: "product-hold" — note go-ahead condition, don't follow up until ready
 
-Budget reference (approximate, adjust per channel size):
-- Dedicated tutorial (5-8 min): $300-800 range depending on subs and engagement
+Budget reference (relative, adjust per channel size):
+- Dedicated tutorial (5-8 min): highest tier, varies by subscriber count and engagement
 - Integration / mention: lower tier
 - Shorts: lowest tier
-- Flag >$1,000 as above-budget; flag very low prices (e.g. $85) as needing size verification
+- Flag quotes above the campaign budget ceiling as above-budget; flag unusually low prices as needing channel-size verification
 
 ---
 
@@ -372,77 +378,93 @@ Budget reference (approximate, adjust per channel size):
 
 ## Lessons Learned
 
+**Day 20 (2026-07-11 → 2026-07-12):**
+
+Google Image Proxy false open: A GMass open notification arrived with User Agent containing `via ggpht.com GoogleImageProxy` and an IP in the `66.249.x.x` Google-owned range. This is Google's image proxy pre-loading email content during spam/safety scanning — not a human opening the email. Rule: when a GMass open notification shows `via ggpht.com GoogleImageProxy` in the User Agent or the IP resolves to the `66.249.x.x` Google range, discard it as a false positive. Do not count toward the warm-signal threshold. This is a third false-positive pattern alongside the existing 8–10 second double-notification rule. The combined false-positive filter is now: (a) two notifications within 8–10 seconds = one pixel fired twice; (b) `GoogleImageProxy` in User Agent or Google IP = spam-scanner pre-fetch; (c) anything else with distinct timestamps >30 min apart = genuine human open.
+
+PayPal reminder = escalation signal: A payment reminder from PayPal (subject "Reminder from [Vendor] (INV-XXXX)") arrived for a pending invoice (small amount, outstanding for several days). PayPal sends automatic reminders only after an invoice remains unpaid past its due date. Rule: when a PayPal email has "Reminder" in the subject, treat it as an escalation — log as "reminder received" in the patrol report with a note that the original invoice has been pending since the first notice date. If the invoice has been flagged in prior reports, update the day-count. This is distinct from a first-notice invoice and should be reported separately in the 🧾 Invoice section as "Reminder — [Vendor] INV-XXXX, first invoiced [date], now [N] days pending."
+
+**Day 19 (2026-07-10 → 2026-07-11):**
+
+Dual-path reply from same KOL manager: A KOL outreached at two different contact addresses (a creator platform and a talent network) had both emails forwarded to the same manager, who replied with identical content from both accounts within 2 minutes. This is distinct from a pure duplicate outreach — it's a legitimate KOL with representation at multiple organizations all handled by one person. Rule: (a) treat both replies as one inquiry; (b) read one for the rate data — content will be identical; (c) draft the reply to whichever thread the contact identifies as their "primary email" (look for that phrase in the body); (d) mark the other thread in Notion as "secondary contact — duplicate reply, no action needed"; (e) log both email addresses in Notion under the same KOL record. Do not reply to both threads.
+
+Far-above-budget reply: A KOL quoted rates several times above the budget ceiling for both integration and dedicated formats. Standard rule applies — surface immediately with format breakdown and "far above budget — needs owner's call" flag. Do not draft a counter at this range; the gap is too wide to close without explicit owner direction on whether to negotiate, decline, or explore a different format tier.
+
+Long-lag reply is still actionable: A KOL outreached weeks prior replied with a complete rate card after a long delay. Treat the reply as a fresh inquiry — no special handling for the delay. Long lags are normal in high-volume outreach; the KOL is still interested.
+
+Warm signal refinement at 4 distinct opens over 3 hours: Confirmed that 4 distinct open events (after filtering GMass double-notifications) spread across ~3 hours reliably predicted a reply within the same patrol window. Refinement to the existing warm signal rule: surface as [WARM — reply likely] when either (a) 3+ distinct opens (post double-notification filtering) span more than 30 minutes, OR (b) 6+ raw notifications arrive within a concentrated window (as in the existing rule). Both patterns are now confirmed predictive. The "concentrated window" calibration was for raw GMass notification counts including doubles; the filtered-distinct-event threshold is lower.
+
 **Day 18 (2026-07-09 → 2026-07-10):**
 
-Payment method impasse as a distinct stall pattern: A KOL partner thread stalled at 31+ days because the partner refused PayPal and offered only wire transfer or crypto. This is not a "waiting on reply" stall — both sides are actively responsive but blocked on payment terms. Rule: when a partner explicitly states they don't accept PayPal and offers only wire/crypto, flag immediately as "payment method mismatch" and surface as a Yori decision item. Aging beyond 7 days without resolution = flag as overdue impasse in every subsequent patrol with a day count. Don't hold silently alongside normal unreplied items.
+Payment method impasse as a distinct stall pattern: A KOL partner thread stalled for an extended period because the partner refused PayPal and offered only wire transfer or crypto. This is not a "waiting on reply" stall — both sides are actively responsive but blocked on payment terms. Rule: when a partner explicitly states they don't accept PayPal and offers only wire/crypto, flag immediately as "payment method mismatch" and surface as an owner decision item. Aging beyond 7 days without resolution = flag as overdue impasse in every subsequent patrol with a day count. Don't hold silently alongside normal unreplied items.
 
-Post-agreement thread staleness rule: A KOL negotiation that reached full agreement on both sides (budget aligned, format confirmed for a dedicated YouTube video) went silent for 45+ days — no contract, no next-step email from either side. Rule: after a KOL agreement is confirmed (budget and format both accepted), if no contract or concrete next-step email is exchanged within 7 days, flag as "stalled post-agreement (day N)" in patrol reports and surface for Yori to send a nudge. Post-agreement silence is as actionable as no-reply to initial outreach. This is distinct from product-hold (where the pause is intentional) — here neither side moved.
+Post-agreement thread staleness rule: A KOL negotiation that reached full agreement on both sides (budget aligned, format confirmed) went silent for an extended period — no contract, no next-step email from either side. Rule: after a KOL agreement is confirmed (budget and format both accepted), if no contract or concrete next-step email is exchanged within 7 days, flag as "stalled post-agreement (day N)" in patrol reports and surface for owner to send a nudge. Post-agreement silence is as actionable as no-reply to initial outreach. This is distinct from product-hold (where the pause is intentional) — here neither side moved.
 
-Product-hold reactivation template confirmed: A product-hold KOL (product-hold since July 3) was reactivated by Yori sending the July collaboration kit + Notion link directly to the partner's contact. The confirmed reactivation format: (1) brief acknowledgement of the wait, (2) confirm product is live and ready, (3) share the latest collab kit URL, (4) ask them to proceed or re-send any script/contract details. This matches the Days 11-14 pattern — now confirmed as the standard. When reactivating, check that the collab kit URL is the current month's version.
+Product-hold reactivation template confirmed: A product-hold KOL was reactivated by sending the current collaboration kit + Notion link directly to the partner's contact. The confirmed reactivation format: (1) brief acknowledgement of the wait, (2) confirm product is live and ready, (3) share the latest collab kit URL, (4) ask them to proceed or re-send any script/contract details. This matches the Days 11-14 pattern — now confirmed as the standard. When reactivating, check that the collab kit URL is the current month's version.
 
-Multiple small invoices per patrol window is now normal: a small payment confirmation (invoice closed) and a new small incoming invoice (invoice number present) arrived in the same patrol window from different KOL vendors. This is expected as the KOL program scales. Log each individually with vendor, amount, invoice number, and status. Keep invoice table in the DM report visually separate from KOL negotiation status rows — they serve different purposes and shouldn't be merged.
+Multiple small invoices per patrol window is now normal: A payment confirmation and a new incoming invoice arrived in the same patrol window from different KOL vendors. This is expected as the KOL program scales. Log each individually with vendor, amount, invoice number, and status. Keep invoice table in the DM report visually separate from KOL negotiation status rows — they serve different purposes and shouldn't be merged.
 
 **Day 17 (2026-07-08 → 2026-07-09):**
 
 Support-ticket merge = duplicate outreach signal: When a KOL routes email through a helpdesk (e.g. Zendesk), a second outreach email from a later batch creates a new ticket. Their team merges it into the original ("Request #XXXX was closed and merged into this request"). This notification lands in the original thread. Rule: merge notification = confirm duplicate outreach occurred. The active thread is the older/merged-into one. No new reply needed unless the contact initiates. Log in Notion as "duplicate outreach — merged into original thread."
 
-Pre-batch domain cross-check via Gmail sent: A creator was already mid-conversation (existing June thread) but got re-outreached on July 8 because CSV deduplication only runs within the current batch and Notion. Add a Gmail sent-folder check before finalizing each batch: search `to:<address> in:sent newer_than:90d` for each recipient. If a sent match exists, pull the thread — if there's already a reply, skip that contact from the batch.
+Pre-batch domain cross-check via Gmail sent: A KOL was already mid-conversation (existing thread) but got re-outreached in a later batch because CSV deduplication only runs within the current batch and Notion. Add a Gmail sent-folder check before finalizing each batch: search `to:<address> in:sent newer_than:90d` for each recipient. If a sent match exists, pull the thread — if there's already a reply, skip that contact from the batch.
 
 "Not familiar with AI tools" inquiry pattern: Contact replied with curiosity but needs product education before they can evaluate fit. This is a warm lead, not a decline. Response template: (1) brief acknowledgement, (2) spell out the format (video length + what they'd do on camera), (3) explain the audience fit hypothesis, (4) give budget range, (5) ask for their rate card. 5–6 short bullets total; no walls of text.
 
 GMass double-notification false positive: Two open-tracking emails arriving within 8–10 seconds from the same recipient = one physical open event triggering two pixels (email client pre-fetch or caching). Do not surface as "opened 2×" or count toward the 6-open warm-signal threshold. (Updated in Core Operating Patterns above.)
 
-Delivery bounce — domain typo: A bounce with "domain couldn't be found" (e.g. "example.comcon") usually means a data-entry typo in the outreach CSV. Extract the probable correct domain (strip the typo suffix), note in patrol report so Yori can retry with the corrected address. Never re-send automatically from a bounced address.
+Delivery bounce — domain typo: A bounce with "domain couldn't be found" usually means a data-entry typo in the outreach CSV. Extract the probable correct domain (strip the typo suffix), note in patrol report so the owner can retry with the corrected address. Never re-send automatically from a bounced address.
 
 **Days 15-16 (2026-07-07 → 2026-07-08):**
 
-Email open tracking as warm signal: When Gmail shows an outbound email opened 6+ times in a concentrated window (e.g. 3–4 minutes), surface immediately in the patrol report as "[WARM] [KOL] opened outreach email N times — likely reply incoming." This helps Yori know a reply is probable before it arrives. Do not wait for the actual reply to flag engagement.
+Email open tracking as warm signal: When Gmail shows an outbound email opened 6+ times in a concentrated window (e.g. 3–4 minutes), surface immediately in the patrol report as "[WARM] [KOL] opened outreach email N times — likely reply incoming." This helps the owner know a reply is probable before it arrives. Do not wait for the actual reply to flag engagement.
 
 Duplicate outreach → duplicate reply threads: If the same KOL contact was accidentally emailed twice within a few minutes (same batch, different send calls), both threads can receive identical replies. When this is detected in the patrol, flag both threads, recommend replying to the most recent one only, and note the earlier thread as stale. Do not draft two separate counter-offers to the same contact.
 
-Small creator invoices ($20–$100): Handled identically to larger invoices — log to Notion with sender, amount, invoice number, and status. PayPal confirmation closes the entry. No special handling needed just because the amount is small.
+Small creator invoices: Handled identically to larger invoices — log to Notion with sender, amount, invoice number, and status. PayPal confirmation closes the entry. No special handling needed just because the amount is small.
 
 **Days 11-14 (2026-07-03 → 2026-07-06):**
 
-Long-overdue invoice resolved: A KOL vendor invoice (17+ days overdue, flagged in 3+ consecutive patrols) was finally paid via PayPal confirmation. When a payment confirmation arrives, close that item from patrol reports immediately and update Notion status to paid. Day-count persistence in reports is effective — continue it.
+Long-overdue invoice resolved: A KOL vendor invoice flagged across multiple consecutive patrols was finally paid via PayPal confirmation. When a payment confirmation arrives, close that item from patrol reports immediately and update Notion status to paid. Day-count persistence in reports is effective — continue it.
 
 New KOL decline type — sponsor volume capacity: A partner declined due to already managing too many sponsors (not budget or audience fit). Response: acknowledge gracefully, express interest for future opportunities, keep door open. Log in Notion as "declined – capacity."
 
 Product-hold KOL reactivation: When product update completes, draft a brief restart email: (1) acknowledge the delay, (2) confirm product is live and filming can proceed, (3) ask them to re-send script / contract details. Use Gmail draft approach; don't auto-send.
 
-Above-budget multichannel KOL: One KOL quoted $2,000 dedicated / $1,500 reel across 4 platforms — 2× above the $1,000 budget ceiling. Surface immediately with subscriber count, format breakdown, and "above budget — needs Yori's call" flag. Do not draft a counter until Yori decides.
+Above-budget multichannel KOL: A KOL quoted above-budget rates across multiple platforms (dedicated + reel formats) — well above the campaign budget ceiling. Surface immediately with subscriber count, format breakdown, and "above budget — needs owner's call" flag. Do not draft a counter until owner decides.
 
 Vendor second billing: A vendor sent a second billing notice for a pending invoice. Note in patrol report as "second billing received, N days outstanding" — makes escalation visible without special action. Continue day-count tracking until resolved.
 
-Expansion scope discussion (pending): Yori raised interest in expanding Email Genius scope to cover product user emails (onboarding / activation sequences). Direction unconfirmed as of Jul 6. Skill file will update once clarified.
+Expansion scope discussion (pending): Owner raised interest in expanding Email Genius scope to cover product user emails (onboarding / activation sequences). Direction unconfirmed as of Jul 6. Skill file will update once clarified.
 
 **Day 10 (2026-06-30):**
 
 heliox email backend down (exit 6): When `heliox email send` or `list` returns exit 6, the backend is unavailable. Fallback: use Gmail MCP `create_draft` to build N drafts in the connected Gmail inbox with all fields filled (To, Subject, Body). Human reviews the drafts in Gmail → Drafts folder and batch-sends. This naturally satisfies any "human review before send" gate and avoids blocking on a broken backend.
 
-1V1 outreach via Gmail draft approach: For any bulk outreach campaign requiring human review before send, the Gmail draft approach is the default path. Create all drafts, surface the count and folder location in the DM, wait for Yori's send confirmation. Never auto-send from an outreach batch.
+1V1 outreach via Gmail draft approach: For any bulk outreach campaign requiring human review before send, the Gmail draft approach is the default path. Create all drafts, surface the count and folder location in the DM, wait for owner's send confirmation. Never auto-send from an outreach batch.
 
-skill ≠ install-time wizard (full team, 2026-06-30, seq 616–626): This skill file is a passive capability doc. When a new user installs it, nothing fires automatically — no heliox commands, no auth cards, no schedule creation. The First-Run Setup wizard in this file only runs if the runtime emits a `skill:install` wake event (a platform-level gap as of 2026-06-30). Until that hook exists, users must explicitly ask to be guided through setup. Do not claim the skill guides users "from 0 to 1 automatically."
+skill ≠ install-time wizard (full team, 2026-06-30): This skill file is a passive capability doc. When a new user installs it, nothing fires automatically — no heliox commands, no auth cards, no schedule creation. The First-Run Setup wizard in this file only runs if the runtime emits a `skill:install` wake event (a platform-level gap as of 2026-06-30). Until that hook exists, users must explicitly ask to be guided through setup. Do not claim the skill guides users "from 0 to 1 automatically."
 
 **Day 9 (2026-06-29):**
 
-Cross-batch KOL duplication: same KOL contact appeared in two separate reply threads because they were included in two different outreach batches. Different from the June 24 triple-send (same email fired 3x from one batch). Fix: deduplicate email addresses across *all prior batches* before starting any new batch, not just within the current one.
+Cross-batch KOL duplication: same KOL contact appeared in two separate reply threads because they were included in two different outreach batches. Different from a prior single-batch multi-send incident (same email sent multiple times from one batch). Fix: deduplicate email addresses across *all prior batches* before starting any new batch, not just within the current one.
 
-PDF rate cards: one partner sent pricing exclusively inside a PDF attachment. Script cannot extract PDF content. When replying with a counter-offer, use flexible phrasing ("We typically budget in the $X–Y range for channels at your size") rather than an exact counter. Flag in patrol report that attachment was unreadable so Yori can open manually if needed.
+PDF rate cards: one partner sent pricing exclusively inside a PDF attachment. Script cannot extract PDF content. When replying with a counter-offer, use flexible phrasing ("We typically budget in the $X–Y range for channels at your size") rather than an exact counter. Flag in patrol report that attachment was unreadable so owner can open manually if needed.
 
 Multiple PayPal confirmations per patrol: two payment confirmations landed in the same window from different vendors. Normal — log each individually with INV number and vendor. No special handling needed.
 
-Notion @mention burst: Notion sent 8+ rapid-fire notification emails for a single Notion thread update (GTM tracking doc). Auto-skip confirmed correct. No need to surface individual @mention emails in DM — only surface if the body contains an actual task or question directed at Yori (not just "@yorihan" auto-notify).
+Notion @mention burst: Notion sent rapid-fire notification emails for a single Notion thread update. Auto-skip confirmed correct. No need to surface individual @mention emails in DM — only surface if the body contains an actual task or question directed at the owner (not just "@mention" auto-notify).
 
-OAuth token expiry cascade: Gmail MCP token expired and blocked three consecutive patrols (12:00, 15:00, 18:00 JST). When token expires: skip the patrol, DM Yori immediately and send a new auth card via `heliox tool google auth`. Do not silently skip without notifying.
+OAuth token expiry cascade: Gmail MCP token expired and blocked three consecutive patrols. When token expires: skip the patrol, DM owner immediately and send a new auth card via `heliox tool google auth`. Do not silently skip without notifying.
 
 **Days 6-8 (2026-06-26 → 2026-06-28):**
 
 Patrol schedule was understated: the actual cron runs 8 patrols/day (every 3h). Skill file previously listed only 4 windows — corrected to all 8.
 
-KOL price scan automated: Yori asked for a daily Notion price update on Jun 26 after noticing prices weren't being logged. Immediate run covered 6 KOLs; daily automation set up and running from Jun 27. Scan runs ~23:00-00:00 JST, covers all active negotiation threads in inbox, fills 达人价格 field.
+KOL price scan automated: Owner asked for a daily Notion price update after noticing prices weren't being logged. Immediate run covered several KOLs; daily automation set up and running from Jun 27. Scan runs ~23:00-00:00 JST, covers all active negotiation threads in inbox, fills 达人价格 field.
 
-Product-hold KOL category: one product-hold KOL confirmed they'll wait for a UI update before filming. This is distinct from "waiting on partner reply" — both sides are aligned, but we're the blocker. New status: product-hold. No follow-up needed; resume when product is go.
+Product-hold KOL category: a product-hold KOL confirmed they'll wait for a UI update before filming. This is distinct from "waiting on partner reply" — both sides are aligned, but we're the blocker. New status: product-hold. No follow-up needed; resume when product is go.
 
 New agency blast sender: one agency blast sender (mass batches, misaligned audience). Added to auto-filter list. Specific domain tracked in Notion only.
 
@@ -450,7 +472,7 @@ PayPal refund notification: distinct from invoice payment. Incoming refund (outg
 
 Google Search Console: structured data notifications should be auto-skipped like Notion/Google Workspace notifications.
 
-Open items aging: one contract has been pending since Jun 16 (12+ days), Payoneer verification since Jun 26 (3+ days). Patrol reports now include day count for items open >2 days to make the aging visible without Yori having to track it.
+Open items aging: patrol reports now include day count for items open >2 days to make the aging visible.
 
 **Day 3 (2026-06-25):**
 
@@ -460,16 +482,16 @@ Agency noise pattern: one agency sent 3+ blasts from different email threads, al
 
 Patrol catch-up: 06:00 patrol caught items that slipped from 03:00 window. Cross-check previous windows before reporting "new" to avoid double-surfacing.
 
-KOL negotiation gap: one YouTuber quoted $600-800; our proposal was $500 for dedicated — drafted reply acknowledging the gap, asking for flexibility. Lesson: flag when offer is below their stated floor.
+KOL negotiation gap: a KOL quoted above our proposal range for a dedicated format — drafted reply acknowledging the gap, asking for flexibility. Lesson: flag when offer is below their stated floor.
 
-Privacy catch: seq 495 included real vendor names in the Lessons Learned section. Trace flagged before repo push. Rule: generic descriptions only in public files.
+Privacy catch: An earlier version of this file included real vendor names in the Lessons Learned section. Rule: generic descriptions only in public files.
 
 **Day 2 (2026-06-24):**
 
-Bulk outreach: send exactly once per batch; 103 contacts sent x3 by mistake.
+Bulk outreach: send exactly once per batch; a prior bulk outreach batch was sent multiple times by mistake.
 Language: English only; no fallback to Chinese mid-session.
 Report format: the border style is mandatory; freeform paragraphs were rejected.
-Channel: #yoris_friends renamed to #gtm_friends. All skill-updates go to #gtm_friends.
+Channel: #yoris_friends renamed to [#gtm_friends](helio://channel/6a39f2862db71a2d0b485fea). All skill-updates go to [#gtm_friends](helio://channel/6a39f2862db71a2d0b485fea).
 Notion loop: CSV outreach → Gmail send → inbox scan (replies) → Notion import → DM report. Full loop running.
 
 **Day 1 (2026-06-23):**
