@@ -5,7 +5,7 @@ description: 邮件自动化技能 — 巡检 Gmail、分诊来件、起草英�
 
 # email-genius.md
 **Email Genius — Skill File**
-*AI Colleague Skill | Last updated: 2026-07-15 JST (v18.2 — Day 3 negotiation gap line further generalized per Trace :507 review)*
+*AI Colleague Skill | Last updated: 2026-07-16 JST (v19.0 — Day 24: post-agreement warm reactivation signal, rapid open burst as active-review indicator, cross-thread GMass grouping, publication-gated invoice URGENT flag, post-kit 30d re-open pattern)*
 
 ---
 
@@ -303,6 +303,7 @@ Rule: run the send command once per batch. (2026-06-24: 103 contacts sent x3 by 
 - On PayPal refund notification → note in patrol report, no Notion update needed
 - If payment outstanding > 48h → flag in patrol report as overdue with hours or days pending
 - On PayPal reminder email (subject "Reminder from [Vendor]") → escalate: log as "Reminder received, first invoiced [date], now [N] days pending." Report separately in 🧾 Invoice section as reminder, not a new invoice. Do not create a duplicate Notion entry.
+- Publication-gated invoice: when an invoice arrives with explicit "video will be published upon payment" or equivalent language (content already approved and ready, payment is the only trigger to go live), flag as URGENT in the 🧾 Invoice section — delay in payment = delay in live content. Label as "publish gate." Standard overdue thresholds apply starting from the invoice date, but the first mention should carry the URGENT label regardless of how recently it arrived.
 
 ### 6. Daily KOL price scan (automated, ~23:00-00:00 JST)
 Run against all active KOL negotiation threads in Gmail. For each new reply with pricing:
@@ -376,6 +377,18 @@ Budget reference (approximate, adjust per channel size):
 ---
 
 ## Lessons Learned
+
+**Day 24 (2026-07-15 → 2026-07-16):**
+
+Post-agreement warm reactivation signal: A KOL who agreed on pricing terms in June (dedicated video, specific rate) went silent for 36+ days — no contract, no next step from either side. Today they re-opened the original outreach email 6 times (once in the morning, then a burst of 5 between 11:02–11:09 JST), while the negotiation thread itself remained untouched. This is a "post-agreement reactivation warm signal" — stronger than a routine warm open because the context is a known deal that stalled, not a cold prospect. Rule: when a post-agreement-silent KOL re-opens the outreach email after 30+ days, surface as "warm reactivation — [KOL], [N]-day post-agreement silence, re-opened outreach email [M] times today" in the ⚠️ Needs your action section. Suggested action: Yori sends a brief nudge referencing the last agreed terms and asking to confirm the next step (contract or brief). This is time-sensitive because the contact is clearly re-evaluating now.
+
+Rapid open burst (5 opens in <7 minutes) as active-review-right-now signal: The 5-open burst between 11:02–11:09 suggests the contact is actively sharing or re-reading the email in that moment — forwarding to a team, comparing proposals, reviewing on multiple devices. This is meaningfully different from 5 opens spread across hours. Rule: when 3+ opens arrive within a 10-minute window from the same contact (all passing the false-positive filter), surface as "active-review burst — [N] opens in [M] min" as a distinct flag even if the total count is already above the standard warm-signal threshold. The burst is a timing signal: the contact is in the email right now, not just occasionally revisiting.
+
+Cross-thread GMass open grouping: GMass sends each open notification as a new email, and Gmail sometimes assigns each a separate thread ID rather than appending to the original outbound thread. This means a contact with 6 opens shows up as 6 separate single-message threads in a patrol window. Rule: before applying the open-count filter, group all GMass notify@gmass.co emails in the patrol window by recipient address (extracted from the subject line "opened by [email]"). Count per-recipient totals across all thread IDs — do not count per-thread. A contact with 4 notifications across 4 thread IDs is one contact with 4 opens.
+
+Publication-gated invoice: A KOL partner sent an invoice with explicit language tying video publication to payment receipt ("send payment and we can publish it today"). The video was already approved by Yori (July 12). The invoice arrived July 15 — the video has been held back for 3 days at this point. Rule: when an invoice arrives with a publication gate (content approved and ready; partner is waiting on payment to go live), flag as **URGENT** in the 🧾 Invoice section from the first mention. Every day of payment delay is a day of live content lost. Include the publish-gate note so the urgency is visible — "URGENT (publish gate) — [KOL vendor] invoice, video ready, awaiting payment."
+
+Post-kit 30d re-open signal: A second KOL (different from the post-agreement case above) re-opened the outreach email today after 39+ days of silence following Yori's collab kit send on June 6. No rate agreement was reached — they accepted the kit but never replied. Rule: when a KOL re-opens an outreach email after 30+ days of post-kit silence with no reply, add to ⚠️ Needs your action as "re-open signal — [N]-day silence after kit send. Consider a brief check-in ('Did you get a chance to look at the kit?')." This is weaker than a post-agreement signal but still worth a lightweight nudge — the re-open indicates lingering interest.
 
 **Day 23 (2026-07-14 → 2026-07-15):**
 
