@@ -1,6 +1,6 @@
 # email-genius.md
 **Email Genius — Skill File**
-*AI Colleague Skill | Last updated: 2026-07-16 JST (v19.2 — Day 24: post-agreement warm reactivation signal, rapid open burst as active-review indicator, cross-thread GMass grouping, publication-gated invoice URGENT flag, post-kit 30d re-open pattern)*
+*AI Colleague Skill | Last updated: 2026-07-17 JST (v20.3 — Step 0 now collects owner @handle as item 4; pre-flight references Step 0 item 4)*
 
 ---
 
@@ -24,6 +24,7 @@ Before creating anything, tell me:
 1. **Timezone** — every cron depends on it. State it explicitly (e.g. `Asia/Tokyo`, `America/New_York`). I won't assume from context.
 2. **Report channel** — where should patrol reports go? (DM by default; name a channel if you want them posted there instead)
 3. **Integrations needed** — Gmail is required. Notion is optional (needed only for KOL price tracking). Anything else?
+4. **Your Helio @handle** — used as `--owner` when creating automations, so you can pause, edit, or delete them later.
 
 I'll echo your answers back and wait for confirmation before touching any tool.
 
@@ -78,15 +79,17 @@ This is the automation core. Before creating anything:
 
 **Pre-flight (required):**
 1. Confirm your timezone from Step 0 — pass it as `--timezone` on every `automation create`
-2. Check for duplicates: `heliox automation list --json` — duplicate automations run silently twice
-3. Automations are created **disabled** — run `heliox automation update <id> --enable true` after each create
-4. `--timezone` is set at create time only — wrong timezone requires delete and recreate
+2. Confirm your Helio @handle (Step 0 item 4) — pass it as `--owner @<your-handle>` on every `automation create` (**required**; without it the command fails)
+3. Check for duplicates: `heliox automation list --json` — duplicate automations run silently twice
+4. Automations are created **disabled** — run `heliox automation update <id> --enable true` after each create
+5. `--timezone` is set at create time only — wrong timezone requires delete and recreate
 
 **Automation A — Gmail Patrol (every 3 hours, 8×/day)**
 ```bash
 heliox automation create "Gmail 三小时邮件巡查" \
   --cron "0 0,3,6,9,12,15,18,21 * * *" \
   --timezone "<your-timezone>" \
+  --owner @<your-handle-from-Step-0> \
   --procedure "Scan Gmail inbox every 3 hours. Triage emails, draft KOL replies, log invoices. Post patrol report to <report-channel-from-Step-0> with heliox message send." \
   --json
 # Created DISABLED — activate:
@@ -98,6 +101,7 @@ heliox automation update <id-A> --enable true
 heliox automation create "KOL Reply Price Scan" \
   --cron "0 <hour> * * *" \
   --timezone "<your-timezone>" \
+  --owner @<your-handle-from-Step-0> \
   --procedure "Scan for new KOL pricing replies. Extract rates, update Notion KOL database. Post results to <report-channel-from-Step-0> with heliox message send." \
   --json
 # Created DISABLED — activate:
@@ -109,6 +113,7 @@ heliox automation update <id-B> --enable true
 heliox automation create "PayPal Invoice 待支付汇总" \
   --cron "0 <hour> * * *" \
   --timezone "<your-timezone>" \
+  --owner @<your-handle-from-Step-0> \
   --procedure "Scan for outstanding PayPal invoices. Cross-reference payment confirmations, extract payment links. Post pending invoice table to <report-channel-from-Step-0> with heliox message send." \
   --json
 # Created DISABLED — activate:
@@ -373,17 +378,27 @@ Budget reference (approximate, adjust per channel size):
 
 ## Lessons Learned
 
+**Day 25 (2026-07-16 → 2026-07-17):**
+
+PDF invoice extraction confirmed (pdftotext): When an invoice arrives as a PDF attachment, the working extraction path is: (1) run `email_fetch.py attachments <thread_id>` to download the PDF to the local invoice folder; (2) run `pdftotext <path> -` to extract plain text content; (3) parse for invoice number, amount, and due date. The `pdfplumber` Python library is not available in this environment — do not attempt to import it. `pdftotext` (via Homebrew poppler) is the reliable fallback. Confirm the downloaded path from the `attachments` command output before running `pdftotext`.
+
+Concurrent same-partner threads: A single partner (a KOL vendor) had two active threads in the same patrol window — one for a pending invoice (INV-#XXXX) and one for a new collaboration proposal (a ~200k-sub channel). These are structurally independent: the invoice thread needs payment confirmation, the proposal thread needs a negotiation reply. Rule: when the same partner appears across multiple active threads, handle each independently and report them as separate line items in the patrol DM. Do not merge their actions or assume closing one resolves the other.
+
+Quiet-day carry-over check confirmed working: July 16 had five consecutive quiet patrol windows (09:00, 12:00, 15:00, 21:00, 00:00 JST) with zero new emails. The carry-over check (Day 21 rule) ran correctly in each window, surfacing a pending partner invoice, a credit top-up item needing a decision, and an overdue PayPal reminder with updated day counts. This confirms: quiet patrols are not a "nothing to report" — they are aging reviews. The Day 21 rule is now confirmed across multiple quiet-day cycles.
+
+email_fetch.py positional vs flag syntax: The `fetch --count N` flag form fails; use `fetch N` (positional) instead. This is a quirk of the local script's argument parser. When the script errors on `--count`, retry with `fetch 20` (no flag).
+
 **Day 24 (2026-07-15 → 2026-07-16):**
 
-Post-agreement warm reactivation signal: A KOL who agreed on pricing terms in June (dedicated video, specific rate) went silent for 30+ days — no contract, no next step from either side. Today they re-opened the original outreach email 6 times (once in the morning, then a short burst within minutes), while the negotiation thread itself remained untouched. This is a "post-agreement reactivation warm signal" — stronger than a routine warm open because the context is a known deal that stalled, not a cold prospect. Rule: when a post-agreement-silent KOL re-opens the outreach email after 30+ days, surface as "warm reactivation — [KOL], [N]-day post-agreement silence, re-opened outreach email [M] times today" in the ⚠️ Needs your action section. Suggested action: Yori sends a brief nudge referencing the last agreed terms and asking to confirm the next step (contract or brief). This is time-sensitive because the contact is clearly re-evaluating now.
+Post-agreement warm reactivation signal: A KOL who agreed on pricing terms in June (dedicated video, specific rate) went silent for 36+ days — no contract, no next step from either side. Today they re-opened the original outreach email 6 times (once in the morning, then a burst of 5 between 11:02–11:09 JST), while the negotiation thread itself remained untouched. This is a "post-agreement reactivation warm signal" — stronger than a routine warm open because the context is a known deal that stalled, not a cold prospect. Rule: when a post-agreement-silent KOL re-opens the outreach email after 30+ days, surface as "warm reactivation — [KOL], [N]-day post-agreement silence, re-opened outreach email [M] times today" in the ⚠️ Needs your action section. Suggested action: Yori sends a brief nudge referencing the last agreed terms and asking to confirm the next step (contract or brief). This is time-sensitive because the contact is clearly re-evaluating now.
 
-Rapid open burst as active-review-right-now signal: The burst suggests the contact is actively sharing or re-reading the email in that moment — forwarding to a team, comparing proposals, reviewing on multiple devices. This is meaningfully different from 5 opens spread across hours. Rule: when 3+ opens arrive within a 10-minute window from the same contact (all passing the false-positive filter), surface as "active-review burst — [N] opens in [M] min" as a distinct flag even if the total count is already above the standard warm-signal threshold. The burst is a timing signal: the contact is in the email right now, not just occasionally revisiting.
+Rapid open burst (5 opens in <7 minutes) as active-review-right-now signal: The 5-open burst between 11:02–11:09 suggests the contact is actively sharing or re-reading the email in that moment — forwarding to a team, comparing proposals, reviewing on multiple devices. This is meaningfully different from 5 opens spread across hours. Rule: when 3+ opens arrive within a 10-minute window from the same contact (all passing the false-positive filter), surface as "active-review burst — [N] opens in [M] min" as a distinct flag even if the total count is already above the standard warm-signal threshold. The burst is a timing signal: the contact is in the email right now, not just occasionally revisiting.
 
 Cross-thread GMass open grouping: GMass sends each open notification as a new email, and Gmail sometimes assigns each a separate thread ID rather than appending to the original outbound thread. This means a contact with 6 opens shows up as 6 separate single-message threads in a patrol window. Rule: before applying the open-count filter, group all GMass notify@gmass.co emails in the patrol window by recipient address (extracted from the subject line "opened by [email]"). Count per-recipient totals across all thread IDs — do not count per-thread. A contact with 4 notifications across 4 thread IDs is one contact with 4 opens.
 
-Publication-gated invoice: A KOL partner sent an invoice with explicit language tying video publication to payment receipt ("send payment and we can publish it today"). The video was already approved by Yori earlier that week. The invoice arrived a few days later — the video has been held back. Rule: when an invoice arrives with a publication gate (content approved and ready; partner is waiting on payment to go live), flag as **URGENT** in the 🧾 Invoice section from the first mention. Every day of payment delay is a day of live content lost. Include the publish-gate note so the urgency is visible — "URGENT (publish gate) — [KOL vendor] invoice, video ready, awaiting payment."
+Publication-gated invoice: A KOL partner sent an invoice with explicit language tying video publication to payment receipt ("send payment and we can publish it today"). The video was already approved by Yori (July 12). The invoice arrived July 15 — the video has been held back for 3 days at this point. Rule: when an invoice arrives with a publication gate (content approved and ready; partner is waiting on payment to go live), flag as **URGENT** in the 🧾 Invoice section from the first mention. Every day of payment delay is a day of live content lost. Include the publish-gate note so the urgency is visible — "URGENT (publish gate) — [KOL vendor] invoice, video ready, awaiting payment."
 
-Post-kit 30d re-open signal: A second KOL (different from the post-agreement case above) re-opened the outreach email today after 30+ days of silence following Yori's collab kit send. No rate agreement was reached — they accepted the kit but never replied. Rule: when a KOL re-opens an outreach email after 30+ days of post-kit silence with no reply, add to ⚠️ Needs your action as "re-open signal — [N]-day silence after kit send. Consider a brief check-in ('Did you get a chance to look at the kit?')." This is weaker than a post-agreement signal but still worth a lightweight nudge — the re-open indicates lingering interest.
+Post-kit 30d re-open signal: A second KOL (different from the post-agreement case above) re-opened the outreach email today after 39+ days of silence following Yori's collab kit send on June 6. No rate agreement was reached — they accepted the kit but never replied. Rule: when a KOL re-opens an outreach email after 30+ days of post-kit silence with no reply, add to ⚠️ Needs your action as "re-open signal — [N]-day silence after kit send. Consider a brief check-in ('Did you get a chance to look at the kit?')." This is weaker than a post-agreement signal but still worth a lightweight nudge — the re-open indicates lingering interest.
 
 **Day 23 (2026-07-14 → 2026-07-15):**
 
@@ -411,7 +426,7 @@ Broken commitment vs. normal overdue: A YouTuber partner was on their third foll
 
 PandaDoc contract completion as milestone signal: A PandaDoc notification email arrived with subject "[Agreement Name] has been completed by all participants." This is a new email type not previously codified. Rule: when PandaDoc sends a completion notification, treat it as a contract-signed milestone — log in Notion as "contract signed" for the relevant KOL, update status from "waiting on contract" to "contract-complete, filming TBD." Flag in patrol report as "✅ [KOL vendor] contract signed." This is distinct from (a) PandaDoc invitation emails ("you've been sent a document to sign"), (b) PayPal invoice/payment emails, and (c) reminder emails.
 
-Quiet-inbox carry-over escalation: On a quiet patrol day, no new emails arrived in the inbox. During quiet days, carry-over items age silently without a new-email trigger to surface them. Rule: when a patrol window finds zero new emails, explicitly list all open carry-over items with their current day-count — treat the patrol as an aging review, not a "nothing to report" skip. Example carry-overs from a quiet-inbox day: (a) a small vendor invoice overdue with a PayPal reminder already sent — Yori owes this payment; (b) a KOL partner reply marked "not familiar with AI tools" — several days unanswered, draft still needed; (c) a KOL channel awaiting Yori response on a counter-offer below their stated floor (older carry-over, needs reply); (d) a partner with a payment method impasse (refused PayPal, wants wire/crypto) — older carry-over, needs Yori decision on wire/crypto vs. dropping. Invoice Day-count escalation thresholds: Day 1-2 = note in report; Day 3-4 = "overdue" flag; Day 5+ = "overdue — escalate" flag with explicit recommended action.
+Quiet-inbox carry-over escalation: On July 12 JST, no new emails arrived in the inbox. During quiet days, carry-over items age silently without a new-email trigger to surface them. Rule: when a patrol window finds zero new emails, explicitly list all open carry-over items with their current day-count — treat the patrol as an aging review, not a "nothing to report" skip. Example carry-overs from a quiet-inbox day: (a) a small vendor invoice overdue with a PayPal reminder already sent — Yori owes this payment; (b) a KOL partner reply marked "not familiar with AI tools" — several days unanswered, draft still needed; (c) a KOL channel awaiting Yori response on a counter-offer below their stated floor (Day 18+); (d) a partner with a payment method impasse (refused PayPal, wants wire/crypto) — Day 34+, needs Yori decision on wire/crypto vs. dropping. Invoice Day-count escalation thresholds: Day 1-2 = note in report; Day 3-4 = "overdue" flag; Day 5+ = "overdue — escalate" flag with explicit recommended action.
 
 **Day 20 (2026-07-11 → 2026-07-12):**
 
