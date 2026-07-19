@@ -1,6 +1,6 @@
 # email-genius.md
 **Email Genius — Skill File**
-*AI Colleague Skill | Last updated: 2026-07-19 JST (v20.5 — Day 27 lessons: technical product evaluation inquiry new email type, standard PayPal invoice sender path confirmed)*
+*AI Colleague Skill | Last updated: 2026-07-20 JST (v20.6 — Day 28 lessons: Google Image Proxy batch-scan cluster rule, Stripe invoice delivery path, commitment breach follow-up pattern confirmed)*
 
 ---
 
@@ -377,6 +377,14 @@ Budget reference (approximate, adjust per channel size):
 ---
 
 ## Lessons Learned
+
+**Day 28 (2026-07-19 → 2026-07-20):**
+
+Google Image Proxy batch scan (false positive cluster): Two GMass open notifications arrived 31 seconds apart (from two different recipients, different outbound campaigns), both with identical User Agent `Mozilla/5.0 (Windows NT 5.1; rv:11.0) Gecko Firefox/11.0 (via ggpht.com GoogleImageProxy)` and identical IP 74.125.209.166 (Google range). This is Google's image proxy scanning multiple outbound emails in a single batch pass — not two independent human opens. Both were correctly discarded as false positives per the Day 20 rule. Rule refinement: when multiple GMass open notifications arrive within a 60-second window sharing the same IP in Google's range (66.249.x.x or 74.125.x.x) AND the same `GoogleImageProxy` User Agent, treat the entire cluster as one image proxy batch scan and discard all entries in the group. None count toward warm-signal thresholds. This extends the Day 20 single-notification rule to cover batch scans that hit multiple outbound emails simultaneously.
+
+Stripe invoice as a new trusted delivery path: A vendor invoice arrived from `invoice+statements+acct_[id]@stripe.com` — Stripe's standard system invoice notification address, analogous to PayPal's `service@paypal.com`. This is the first Stripe-routed invoice encountered. Rule: when an invoice arrives from a sender matching `invoice+statements+acct_*@stripe.com`, treat it as a Stripe-routed invoice with a trusted platform delivery path. No domain-mismatch flag (the vendor's own domain is not the sender — Stripe is the router, just as PayPal is for service@paypal.com invoices). Log with vendor name (extracted from email body/subject), invoice number, and amount, identically to PayPal invoices. Verify trust at the domain level — sender must be @stripe.com; the `acct_[id]` portion varies per vendor. This extends the invoice delivery path rules to cover Stripe alongside PayPal.
+
+Commitment breach follow-up timing confirmed: A KOL partner with an active video collaboration (script confirmed, deposit in progress) committed "the draft will be ready within 24 hours" on July 16. Draft did not arrive. On July 19 (Day 3 from the promise), Yori sent a direct follow-up explicitly referencing the July 16 commitment. This is the Day 26 rule executed correctly. Rule confirmed and extended: after an explicit 24h promise goes unfulfilled, follow up by Day 2-3 with a message naming the specific promise and date — not a generic "checking in." After the follow-up is sent, the patrol's role shifts to response tracking: if no reply arrives within 24h of the follow-up itself, re-flag as "follow-up unanswered, Day N from original promise." Day count continues from the original promise date, not the follow-up date.
 
 **Day 27 (2026-07-18 → 2026-07-19):**
 
