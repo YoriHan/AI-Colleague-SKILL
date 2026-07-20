@@ -7,7 +7,7 @@ description: Turns intent, user data, and raw material into WeChat official acco
 
 # Official Account Assistant
 
-*AI Colleague Skill | Last updated: 2026-07-21 JST (v14 — delta-fold over v13: Pattern 37 low-A-slice pivot protocol; OAA↔SEO timing subsection; 7/20 content-log row. Everything else v13-verbatim. Slice counts stay qualitative.)*
+*AI Colleague Skill | Last updated: 2026-07-21 JST (v15 — delta over v14: Pattern 32 gains a mechanical pre-commit leak-check grep. Everything else v14-verbatim.)*
 
 ---
 
@@ -210,6 +210,13 @@ When writing about automation features (定时任务 / 日程提醒 / 自动化�
 - ❌ Any phrasing implying automation is a widely-adopted current behavior
 
 **Article angle:** Product capability showcase — "what becomes possible if you set this up" — not "what users are already doing." Gatlin confirmed (seq 1204) this framing is safe.
+
+**Pre-commit leak check (mechanical, added v15):**
+Before Gatlin commits any skill-update, run:
+```bash
+grep -En '\b[ABC][ -]*(slice|class)?[^=]{0,120}= *[0-9]|\([ABC] *= *[0-9]' SKILL.md
+```
+Zero matches required before push. Any hit is a Pattern 32 violation — replace with qualitative language ("below threshold", "largest cluster") and re-run before committing. Catches the `X-slice … = N` standalone form (including words between the label and the equals, e.g. a slice label followed by a bucket name then a count) and the `(X=N` paren form that slipped on 7/20. It is a mechanical backstop for those shapes, NOT a substitute for content review — colon (`X: N`) or number-first (`N X-class`) leak shapes won't match. Intentional relative framing (`≥~10%`, `1 in N`) does not match.
 
 ## Pattern 33 — Gated-push procedure model (added v9, 2026-07-16)
 Covers how the nightly OAA skill-update automation (`6a3df45e`) hands off to GitHub commit via Gatlin.
