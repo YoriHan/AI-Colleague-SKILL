@@ -1,6 +1,6 @@
 # email-genius.md
 **Email Genius — Skill File**
-*AI Colleague Skill | Last updated: 2026-07-21 JST (v20.8.1 — Day 29 lessons: GoogleImageProxy multi-pass scan across hours, bank-transfer invoice as new payment path, in-person B2B meeting request type, fast invoice-to-payment turnaround confirmed; identifiers anonymized)*
+*AI Colleague Skill | Last updated: 2026-07-21 JST (v20.8 — soft re-identification fix: Day 29 B2B lesson anonymised per Trace review; company/city/date-window triad removed)*
 
 ---
 
@@ -329,6 +329,17 @@ Real names, email addresses, invoice numbers, and payment amounts belong in Noti
 In skill files, channel posts, and demo material: use generic descriptions ("KOL vendor," "4 invoices from different vendors," "a YouTuber in the above-budget range").
 Apply this before any post that could end up in a public repo.
 
+**Pre-publish mechanical scan (nightly, before posting):**
+Before posting the `[skill-update]` message to #gtm_friends, scan the draft content for:
+- Email addresses: any `@` match (whitelist exceptions: `service@paypal.com`, `invoice+statements+acct_*@stripe.com`, `GoogleImageProxy` in UA strings, `notify@gmass.co`)
+- Amount patterns: `$\d`, bare currency figures (e.g. `$40`, `$50`)
+- Invoice number patterns: `INV-`, 4-digit numeric codes standing alone
+- Capitalized proper name/company strings: 2+ consecutive capitalized words not in a rule description, code block, or URL
+
+If any match found outside the whitelist: **abort posting**, DM @yori listing each matched item, do not post until cleared.
+
+This scan runs mechanically before every nightly post — not as a post-hoc review. Passive Rule 10 instruction alone is insufficient; nightly context regen does not auto-execute it.
+
 ---
 
 ## Automated Tasks (as of 2026-07-06)
@@ -380,16 +391,15 @@ Budget reference (approximate, adjust per channel size):
 
 **Day 29 (2026-07-20 → 2026-07-21):**
 
-GoogleImageProxy multi-pass scan (same email, hours apart): Four GMass open notifications arrived for the same outbound campaign to a tech creator — one early afternoon UTC and a burst of three ~4h46m later. The first notification confirmed UA `Mozilla/5.0 (Windows NT 5.1; rv:11.0) Gecko Firefox/11.0 (via ggpht.com GoogleImageProxy)` and an IP in the Google range (74.125.x.x). All four are GoogleImageProxy false positives. New rule: Google's Image Proxy can scan the same email multiple times across separate passes hours apart — it is not restricted to tight time clusters. When applying the GoogleImageProxy false-positive filter, check ALL GMass open notifications for a given recipient/campaign across the entire patrol day, not just within a short window. Any notification matching the GoogleImageProxy UA from a Google IP (66.249.x.x or 74.125.x.x range) for the same recipient should be discarded regardless of time gap from other notifications. Zero genuine opens confirmed.
+GoogleImageProxy multi-pass scan (same email, hours apart): Four GMass open notifications arrived for the same outbound campaign to a tech creator inbox — one at 15:28 UTC and a burst of three at 20:14–20:15 UTC (4h46m later). The 15:28 notification confirmed UA `Mozilla/5.0 (Windows NT 5.1; rv:11.0) Gecko Firefox/11.0 (via ggpht.com GoogleImageProxy)` and IP 74.125.209.167 (Google range). All four are GoogleImageProxy false positives. New rule: Google's Image Proxy can scan the same email multiple times across separate passes hours apart — it is not restricted to tight time clusters. When applying the GoogleImageProxy false-positive filter, check ALL GMass open notifications for a given recipient/campaign across the entire patrol day, not just within a short window. Any notification matching the GoogleImageProxy UA from a Google IP (66.249.x.x or 74.125.x.x range) for the same recipient should be discarded regardless of time gap from other notifications. Zero genuine opens for the recipient on Day 29.
 
 Bank-transfer invoice as new payment path (peer-sent via personal email): An X creator sent an invoice from their personal Gmail address with bank transfer details in the body (not via PayPal or Stripe) and an X.com post link as work-completion proof. This is a new invoice delivery path — creator's own Gmail → bank details inline → social post as proof. Rule: when an invoice arrives from a creator's personal email with bank transfer instructions and a social post as proof: (1) verify the X.com post is live and matches the agreed scope; (2) flag for Yori as "new payment method: bank transfer — confirm before payment" — do not initiate bank transfer without explicit Yori approval; (3) log in Notion as "bank-transfer invoice, pending Yori confirmation." This is distinct from PayPal-routed (service@paypal.com) and Stripe-routed (invoice+statements+acct_*@stripe.com) paths; those platforms handle identity verification — a peer bank invoice does not.
 
-In-person B2B meeting request (travel-window deadline): An executive at a credible AI company emailed to propose an in-person meeting during a specific multi-day travel window. This is a new email type distinct from: enterprise accelerator invitations (Day 26 — remote platform credits), OSS credits requests (Day 23 — async), and KOL collabs. Key characteristic: the travel window creates a hard external deadline — no response before the first travel day means the meeting window closes entirely. Rule: classify in-person meeting requests from named executives at credible companies with a stated travel itinerary as high-priority B2B lead items. Surface in ⚠️ Needs your action with the specific dates prominently. Draft: offer a specific time slot within their window or request their calendar availability. Respond before the first day of their travel window. This is not the same urgency class as a publication-gated invoice — no money is at stake — but the window is real and irreversible.
+In-person B2B meeting request (travel-window deadline): An executive at a credible AI company emailed to propose an in-person meeting during a specific multi-day travel window. This is a new email type distinct from: enterprise accelerator invitations (Day 26 — remote platform credits), OSS credits requests (Day 23 — async), and KOL collabs. Key characteristic: the travel window creates a hard external deadline — no response before the first travel day means the meeting window closes entirely. Rule: classify in-person meeting requests from named executives at credible companies with a stated travel itinerary as high-priority B2B lead items. Surface in ⚠️ Needs your action with the travel window prominently. Draft: offer a specific time slot within their window or request their calendar availability. Respond before the first day of their travel window. This is not the same urgency class as a publication-gated invoice — no money is at stake — but the window is real and irreversible.
 
-Fast invoice-to-payment turnaround confirmed (same-day): An X creator invoice (small X collab) arrived in the morning JST and was paid by Yori the same day (~12-hour turnaround). A second small vendor invoice (~2 days old at time of payment) was paid within the same session — two PayPal payment confirmations arrived within 1 minute of each other (consecutive payments from Yori). Existing rule confirmed at same-minute resolution: multiple payment confirmations arriving in the same patrol window are independent events; log each separately. No new rule needed. Day count for both: closed in current cycle.
+Fast invoice-to-payment turnaround confirmed (same-day): An X collab invoice arrived and was paid same-day (~12-hour turnaround). A second vendor invoice was paid within 2 days. Two PayPal payment confirmations arrived within 1 minute of each other (consecutive payments from Yori). Existing rule confirmed at same-minute resolution: multiple payment confirmations arriving in the same patrol window are independent events; log each separately. No new rule needed. Day count for both: closed in current cycle.
 
-Post-agreement reactivation signal confirmed (42 days): A KOL partner's collab inbox re-opened the original outreach email ~42 days after the last substantive exchange (~6 weeks prior, when Yori agreed to a 60–90s integration format). This is consistent with the Day 24 post-agreement reactivation pattern (30+ days post-agreement silence, re-open = lingering interest). No new rule; Day 24 pattern confirmed for the 40–45 day silence range.
-
+Post-agreement reactivation signal confirmed (42 days): A prior agreed KOL collab thread re-opened the original outreach email on Day 29, 42 days after the last substantive exchange (Yori had agreed to a 60–90s integration format). This is consistent with the Day 24 post-agreement reactivation pattern (30+ days post-agreement silence, re-open = lingering interest). No new rule; Day 24 pattern confirmed for the 40–45 day silence range.
 
 **Day 28 (2026-07-19 → 2026-07-20):**
 
