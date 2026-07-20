@@ -7,7 +7,7 @@ description: Turns intent, user data, and raw material into WeChat official acco
 
 # Official Account Assistant
 
-*AI Colleague Skill | Last updated: 2026-07-20 JST (v13 — metric scrub complete: all exact internal counts replaced with qualitative bands; hero case de-id finalized; Pattern 33 committer corrected)*
+*AI Colleague Skill | Last updated: 2026-07-21 JST (v14 — delta-fold over v13: Pattern 37 low-A-slice pivot protocol; OAA↔SEO timing subsection; 7/20 content-log row. Everything else v13-verbatim. Slice counts stay qualitative.)*
 
 ---
 
@@ -296,6 +296,17 @@ From the 旗舰文 review cycle (seqs 1591–1597). Two failure modes caught by 
 
 **General principle:** All revisions in the Gatlin data-gate pass must be reductive (downgrade or remove). If you find yourself adding a new specific claim in response to Gatlin's catch — stop and flag for separate verification instead.
 
+## Pattern 37 — Low A-slice pivot protocol (added v14, 2026-07-20)
+When Gatlin's message-level A/B/C slice of the selected bucket returns an A-class pool **below the ~10% threshold** of the verified subset (the direction that assumed widespread adoption is not supported by verified audience data):
+
+- **Don't abandon the topic** — pivot the narrative anchor to the aspiration or pain the B-cluster holds. B-cluster (researching/designing but not yet running) signals ICP intent, not absence of market.
+- The opening shifts from "result accomplished" to "problem I was having → what I tried → where we are now." Article structure stays intact; only the anchor changes.
+- A pain hook the B-cluster genuinely holds (e.g. "我一个人管不过来" / multi-line-operations overwhelm) is stronger and more honest than claiming a fully-shipped result. "还在一起调" (still calibrating together) beats an overclaimed outcome.
+- **Name the pivot explicitly** to Gatlin and Yori — a narrative-anchor shift is a direction change (Pattern 29/Yori-confirmation gate applies); never quietly swap the angle.
+- A-slice counts stay internal (Pattern 32) — they drive the direction call, never appear in article copy or the public content log.
+
+*(Origin: 2026-07-20 backend-builder direction. Raw "搭后台/CMS" bucket looked writable; Gatlin's slice found A below threshold with the B-cluster larger, so the anchor pivoted from a shipped-backend claim to multi-line-operations pain. Held to ICP by not forcing a product/technical-persona bucket instead.)*
+
 ---
 
 ## OAA ↔ SEO Genius Coordination (updated 2026-07-13)
@@ -314,6 +325,11 @@ From the 旗舰文 review cycle (seqs 1591–1597). Two failure modes caught by 
 - Strict AND across two consecutive windows
 - Gatlin reports clean/polluted split with denominator each window
 - If bar not cleared: escalate together (OAA + SEO Genius) to Yori for positioning review
+
+**Timing coordination (added v14, 2026-07-20):**
+- After Yori authorizes a topic direction, OAA and SEO Genius align on a publish window so the social post and the corresponding landing page / pillar article ship within a few days of each other.
+- Neither side waits indefinitely: if the landing page lags, OAA can post the awareness piece first with a placeholder CTA, then swap in the real CTA when the page lands.
+- SEO topic priority order (current, per SEO Genius input 2026-07-20): (1) skill/agent automation, (2) CMS/admin builder, (3) team of AI agents.
 
 ---
 
@@ -350,11 +366,13 @@ From the 旗舰文 review cycle (seqs 1591–1597). Two failure modes caught by 
 | 2026-07-16 | Direction #2 — Agent/Skill 开发 | 「组一支 AI 团队，把重复活儿做成自动跑的 skill」; 7/09-7/15 data | Selected; drafting queue |
 | 2026-07-18 | Direction 5 — AI 团队做設計 | 「你出想法，AI 团队出稿」; 設計 leading sub-bucket (7/11-7/17 presence); 小红书 platform; Pattern 34 caveat applied | Selected 2026-07-18; drafting queue |
 | **2026-07-19** | **AI 编排/orchestration 旗舰文** | **「我给三个 AI 同事写了岗位说明书」; small A-class case pool; hero = AI 一人公司 (synthetic shape); Pattern 35+36 applied** | **v3 — Gatlin data gate ✅ — Awaiting Yori direction confirmation. Artifact: https://app.helio.im/a/6a5ccd2f4a083baa35de98ee** |
+| 2026-07-20 | D1 pivot — 「一个人用 AI 跑三条业务线」/「我一个人管不过来」公众号 awareness | Pivot from 「AI 搭后台」 per Pattern 37: A-slice below threshold, B-cluster larger → anchor shifted to multi-line-operations pain. Gatlin holds de-identified skeleton (early-morning dispatch, three lanes, real friction point) | Pending Yori confirmation before drafting |
 
 ---
 
 ## Changelog
 
+- **v14** (2026-07-21 JST): Delta-fold over v13 (three blocks, everything else v13-verbatim). Pattern 37 — low-A-slice pivot protocol (below-threshold A → pivot anchor to B-cluster pain, don't abandon; name the pivot; counts stay internal). OAA↔SEO Coordination gains a Timing subsection (publish-window alignment, awareness-first-with-placeholder-CTA, SEO priority order). Content log gains the 7/20 D1 pivot row (qualitative — no slice counts). No changes to v13 Patterns 28–36, Topic Selection Rules, Approved/Retired Patterns, or Red lines. (Supersedes the withdrawn v2.3 full-file replacement, reverted at commit 320c739.)
 - **v13** (2026-07-20 JST): Full public-repo scrub (two reviewer passes, Trace + Gatlin). Contamination rates, distinct counts, threshold counts, workspace/person counts, and singleton counts replaced with qualitative wording throughout. Hero case ① de-id finalized: verbatim quoted prompt removed, trigger paraphrased to synthetic category shape. Pattern 33 committer corrected (Trace → Gatlin). Intentional relative framing preserved (`1 in N`, `≥~10%`).
 - **v12** (2026-07-20 JST): Public-repo scrub pass 1 — removed exact window/user counts; de-identified hero case verticals and agent roles; corrected Pattern 33 committer Trace → Gatlin. Residual exact internal counts and quoted prompt anchor remained; superseded by v13.
 - **v11** (2026-07-20 00:00 JST): 7/12–7/18 window raw data. Direction "把 AI 当团队编排调度" selected (seqs 1583–1590): notable behavioral signal (AI colleague @-commanding), A/B/C slice on verified subset → small A-class pool / majority B / remainder C. Pattern 35: case pool A/B/C protocol — run deep slice before anchoring article; three-layer article structure (B/C pain-point opening → hero A-case → embedded workflow example). Pattern 36: claim-downgrade discipline — "搭好+测一次 ≠ 持续自动跑"; "AI 团队日常运转搭起来" ≠ "公司运转"; all Gatlin-gate revisions must be reductive. A-class case pool documented (de-identified). 旗舰文 v3 Gatlin-verified (seqs 1591–1597), awaiting Yori direction confirmation. Pattern 30 updated with flagship line. 7/18 raw data section marked superseded.
