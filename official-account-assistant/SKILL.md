@@ -7,7 +7,7 @@ description: Turns intent, user data, and raw material into WeChat official acco
 
 # Official Account Assistant
 
-*AI Colleague Skill | Last updated: 2026-07-21 JST (v15 — delta over v14: Pattern 32 gains a mechanical pre-commit leak-check grep. Everything else v14-verbatim.)*
+*AI Colleague Skill | Last updated: 2026-07-22 JST (v17 — delta over v15 (sha b3d29465): Dual-Vignette Format added as Pattern 37 subsection; D1 content log updated to Gatlin-cleared (seq 1759), pending Trace + Yori. Everything else v15-verbatim.)*
 
 ---
 
@@ -314,6 +314,33 @@ When Gatlin's message-level A/B/C slice of the selected bucket returns an A-clas
 
 *(Origin: 2026-07-20 backend-builder direction. Raw "搭后台/CMS" bucket looked writable; Gatlin's slice found A below threshold with the B-cluster larger, so the anchor pivoted from a shipped-backend claim to multi-line-operations pain. Held to ICP by not forcing a product/technical-persona bucket instead.)*
 
+### Dual-Vignette Format (added v17, 2026-07-22)
+An alternative awareness format for when A-slice is below threshold but B-cluster has two strong, distinct archetypes. Instead of one protagonist, two parallel single-case stories in the same piece.
+
+**When to use:**
+- A-slice doesn't support a "many users do X" claim
+- Two real, distinct user archetypes emerged from Gatlin's slice — different enough to contrast naturally
+- The pain is about orchestrating AI as a team, not a specific deliverable
+
+**Structure:**
+```
+两个人，背景天壤之别。
+
+[Vignette A — 3–4 sentences: who they are, their dispatch rhythm, what's in progress]
+
+[Vignette B — 3–4 sentences: who they are, their workflow pattern, how they direct the AI team]
+
+[Landing: what the two share — the team mindset, not the tool]
+
+[Honest close: "什么都还在建中" — nothing is perfectly running, but the rhythm is there]
+```
+
+**Red lines for this format:**
+- Neither vignette can claim the product/project is shipped and running — write as "在搭" / "在推进"
+- "三条线同时在转" (all in motion) is only safe if Gatlin verified active execution on each line; "同时铺开" (spread across) is the honest alternative when some lines lack activity evidence
+- Quantity framing ("这样的用户有 N 个") is never allowed — the piece grounds in the specific two cases only
+- De-identification applies to the pair together: combination of industry + role + product line across two vignettes can be re-identifying even when each element alone is safe — run Pattern 29 check on both vignettes as a unit
+
 ---
 
 ## OAA ↔ SEO Genius Coordination (updated 2026-07-13)
@@ -373,12 +400,13 @@ When Gatlin's message-level A/B/C slice of the selected bucket returns an A-clas
 | 2026-07-16 | Direction #2 — Agent/Skill 开发 | 「组一支 AI 团队，把重复活儿做成自动跑的 skill」; 7/09-7/15 data | Selected; drafting queue |
 | 2026-07-18 | Direction 5 — AI 团队做設計 | 「你出想法，AI 团队出稿」; 設計 leading sub-bucket (7/11-7/17 presence); 小红书 platform; Pattern 34 caveat applied | Selected 2026-07-18; drafting queue |
 | **2026-07-19** | **AI 编排/orchestration 旗舰文** | **「我给三个 AI 同事写了岗位说明书」; small A-class case pool; hero = AI 一人公司 (synthetic shape); Pattern 35+36 applied** | **v3 — Gatlin data gate ✅ — Awaiting Yori direction confirmation. Artifact: https://app.helio.im/a/6a5ccd2f4a083baa35de98ee** |
-| 2026-07-20 | D1 pivot — 「一个人用 AI 跑三条业务线」/「我一个人管不过来」公众号 awareness | Pivot from 「AI 搭后台」 per Pattern 37: A-slice below threshold, B-cluster larger → anchor shifted to multi-line-operations pain. Gatlin holds de-identified skeleton (early-morning dispatch, three lanes, real friction point) | Pending Yori confirmation before drafting |
+| 2026-07-20–22 | D1: 「两个人，背景天壤之别」公众号 awareness (dual-vignette: 调度者×多线编排 + 增长运营×AI团队做内容) | Draft done (dual-vignette format, paired single-case). Gatlin claim + de-id gate passed (seq 1759); pending Trace exact-diff clearance + Yori final approval. |
 
 ---
 
 ## Changelog
 
+- **v17** (2026-07-22 JST): Delta-fold over v15 (base sha b3d29465), two blocks, everything else v15-verbatim. (1) Dual-Vignette Format added as subsection of Pattern 37: alternative awareness format when A-slice is below threshold but B-cluster has two distinct archetypes; parallel single-case stories; red lines on "三条线同时在转", quantity framing, and pair-level Pattern-29 de-identification check. (2) Content log D1 row updated: draft done (dual-vignette), Gatlin claim + de-id gate passed (seq 1759); pending Trace exact-diff clearance + Yori final approval. No changes to Patterns 28–36, Pattern 37 pivot protocol text, Topic Selection Rules, Approved/Retired Patterns, Case Pool, Window Data, or Red lines.
 - **v14** (2026-07-21 JST): Delta-fold over v13 (three blocks, everything else v13-verbatim). Pattern 37 — low-A-slice pivot protocol (below-threshold A → pivot anchor to B-cluster pain, don't abandon; name the pivot; counts stay internal). OAA↔SEO Coordination gains a Timing subsection (publish-window alignment, awareness-first-with-placeholder-CTA, SEO priority order). Content log gains the 7/20 D1 pivot row (qualitative — no slice counts). No changes to v13 Patterns 28–36, Topic Selection Rules, Approved/Retired Patterns, or Red lines. (Supersedes the withdrawn v2.3 full-file replacement, reverted at commit 320c739.)
 - **v13** (2026-07-20 JST): Full public-repo scrub (two reviewer passes, Trace + Gatlin). Contamination rates, distinct counts, threshold counts, workspace/person counts, and singleton counts replaced with qualitative wording throughout. Hero case ① de-id finalized: verbatim quoted prompt removed, trigger paraphrased to synthetic category shape. Pattern 33 committer corrected (Trace → Gatlin). Intentional relative framing preserved (`1 in N`, `≥~10%`).
 - **v12** (2026-07-20 JST): Public-repo scrub pass 1 — removed exact window/user counts; de-identified hero case verticals and agent roles; corrected Pattern 33 committer Trace → Gatlin. Residual exact internal counts and quoted prompt anchor remained; superseded by v13.
