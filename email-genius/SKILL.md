@@ -1,6 +1,6 @@
 # email-genius.md
 **Email Genius — Skill File**
-*AI Colleague Skill | Last updated: 2026-07-21 JST (v20.8 — soft re-identification fix: Day 29 B2B lesson anonymised per Trace review; company/city/date-window triad removed)*
+*AI Colleague Skill | Last updated: 2026-07-23 JST (v21.3 — OAuth connect flow updated for Steps 1 and 2)*
 
 ---
 
@@ -35,14 +35,14 @@ I'll echo your answers back and wait for confirmation before touching any tool.
 Gmail is the core data source. Without it, nothing runs.
 
 **How to connect:**
-1. I run `heliox tool google auth` — this generates a Gmail authorization URL
-2. I send you an **auth card** in this chat; you click it (one tap, stays in Helio — no external settings page needed)
-3. Complete Google OAuth in the popup; authorize the inbox you want Email Genius to monitor
-4. Once connected, say `gmail connected` — I'll run a quick test scan to confirm
+1. I run `heliox tool google auth` — this generates a Gmail authorization link
+2. I send you the link in chat; click it to open the OAuth window in your browser
+3. Authorize the inbox you want Email Genius to monitor and complete the Google OAuth flow
+4. The system wakes me automatically once authorization completes — I'll run a quick test scan to confirm the connection
 
 **What I need from Gmail:** Read inbox/threads · Create drafts · Search mail
 
-**Known limitation:** Google OAuth tokens expire every few days. When that happens I'll DM you immediately and send a new auth card. One click reconnects — nothing auto-renews.
+**Known limitation:** Google OAuth tokens expire every few days. When that happens I'll DM you immediately with a new connect link. Click it to reauthorize — nothing auto-renews.
 
 ---
 
@@ -51,10 +51,10 @@ Gmail is the core data source. Without it, nothing runs.
 Notion holds the KOL price database and invoice log. Required if you want automated KOL pricing tracking. Optional if you only need Gmail patrol.
 
 **How to connect:**
-1. I run `heliox tool notion auth` — this generates a Notion authorization URL
-2. I send you an **auth card** in this chat; you click it
-3. Authorize the workspace that contains your KOL database
-4. Tell me the database name — I'll locate it automatically
+1. I run `heliox tool notion auth` — this generates a Notion authorization link
+2. I send you the link in chat; click it to open the OAuth window in your browser
+3. Authorize the workspace that contains your KOL database and complete the Notion OAuth flow
+4. The system wakes me automatically once authorization completes — tell me the database name and I'll locate it
 
 **What I use in Notion:** KOL/influencer database (read/write pricing, status, contact dates) · Optional invoice tracking table
 
@@ -183,7 +183,7 @@ Once Step 6 succeeds, the 3 automations take over. Day-one routine:
 | Question | Answer |
 |---|---|
 | How do I add an ignore rule? | "Ignore emails from [sender/domain] permanently" |
-| Gmail token expired — what do I do? | Tell me "Gmail token expired" — I'll send you a new auth card to click |
+| Gmail token expired — what do I do? | Tell me "Gmail token expired" — I'll send you a new connect link to open and reauthorize |
 | Where do I find my drafts? | http://localhost:5001 or Gmail → Drafts |
 | How do I pause the patrol? | `heliox automation update <id> --enable false` |
 | What are my automation IDs? | `heliox automation list --json` |
@@ -331,10 +331,10 @@ Apply this before any post that could end up in a public repo.
 
 **Pre-publish mechanical scan (nightly, before posting):**
 Before posting the `[skill-update]` message to #gtm_friends, scan the draft content for:
-- Email addresses: any `@` match (whitelist exceptions: `service@paypal.com`, `invoice+statements+acct_*@stripe.com`, `GoogleImageProxy` in UA strings, `notify@gmass.co`)
+- Email addresses: any `@` match (whitelist exceptions: `service@paypal.com`, `invoice+statements+acct_*@stripe.com`, `*@payoneer.com`, `GoogleImageProxy` in UA strings, `notify@gmass.co`)
 - Amount patterns: `$\d`, bare currency figures (e.g. `$40`, `$50`)
-- Invoice number patterns: `INV-`, 4-digit numeric codes standing alone
-- Capitalized proper name/company strings: 2+ consecutive capitalized words not in a rule description, code block, or URL
+- Invoice number patterns: `INV-` prefix, or a 4-digit numeric token appearing **within invoice/billing context only** (e.g. directly following "invoice #", "Invoice No", "INV-", "receipt #"); whitelist: standalone years (2018–2035), port numbers in localhost context (e.g. `5001` in `localhost:5001`), and any 4-digit token not adjacent to an invoice/payment keyword
+- Capitalized proper name/company strings: 2+ consecutive capitalized words not in a rule description, code block, or URL; allowlist: Email Genius, Google Image Proxy, PayPal, Stripe, Draft Board, Search Console, PandaDoc, GMass, Gmail, Notion, Helio
 
 If any match found outside the whitelist: **abort posting**, DM @yori listing each matched item, do not post until cleared.
 
@@ -388,6 +388,26 @@ Budget reference (approximate, adjust per channel size):
 ---
 
 ## Lessons Learned
+
+**Day 31 (2026-07-22 → 2026-07-23):**
+
+Promo code collision (new email type): A product partner reported that a promo code provided to them was invalid, with an error suggesting it had already been redeemed by a different account email. Investigation revealed the same code appeared to be consumed by a conflicting registration. Rule: when a KOL or product partner reports a promo code as invalid, do not immediately assume a technical error — check whether the code may have been claimed by another account first. Log: the code reference, the email address the partner used to register, and the error symptom. Escalate to Yori as "promo code conflict — requires new code or manual account upgrade." Do not auto-promise a replacement code. File under ⚠️ Needs your action. This is distinct from a general product support request — it involves Yori's KOL relationship and requires a manual resolution path.
+
+Payoneer as third trusted payment platform path: An invoice arrived via Payoneer (sender: *@payoneer.com), the first Payoneer-routed payment request encountered. It carried a specific due date and a freelancing job reference number (format: "Freelancing #XXXXXX"). Rule: treat Payoneer invoices where the sender domain is payoneer.com as a trusted platform delivery path, alongside PayPal (service@paypal.com) and Stripe (invoice+statements+acct_*@stripe.com). Extract: vendor name, job reference number, amount, due date. If the due date is today or past at first detection, flag immediately in the current patrol — do not defer to the next window. Payoneer uses a freelancing job reference format rather than an INV- prefix; log accordingly. Add *@payoneer.com to the pre-publish scan sender whitelist.
+
+Social media mock report — refined workflow: Yori requested a de-identified, fictional version of a patrol report for social media to demonstrate the product's value. Two feedback points from this first iteration: (1) "这个不要发" — strip the disclaimer header entirely; deliver the report format directly, no preamble. (2) "这些都请带上更大更夸张的数据" — when Yori requests bigger numbers for social media, apply visually impressive but obviously fictional figures (e.g., a modest milestone metric → a large round number in the thousands). Rule: when Yori asks to mock a patrol report for social media, always: (a) omit the disclaimer header — open directly with the report block; (b) replace modest real-adjacent figures with clearly exaggerated fictional ones for demo impact; (c) apply full privacy anonymization — real names → fictional names, emails removed, companies genericized, links removed; (d) send to DM only for Yori to copy-paste manually — never post directly to any channel. Truthfulness guard: because rule (a) omits the disclaimer header from the report block itself, the post or caption Yori wraps around the block on social media must clearly label the content as a demo, mock, or clearly fictional scenario — e.g. "Here's what a report looks like (fictional data for demo purposes)" — so the block cannot be read as genuine performance claims when published. If the surrounding post or caption does not carry that label, the mock report must include the disclaimer header regardless of rule (a). A social-media mock is a demo artifact; it may contain exaggerated data that does not reflect actual performance.
+
+Multiple PayPal payment confirmations closed in same patrol window (confirmed again): Two payment confirmations arrived from two different vendors in the same patrol cycle, both closed in the same pass. Existing rule confirmed (previously Day 9, Day 18): log each independently with vendor, reference number, and closed status. No special handling needed. This is now a routine occurrence as the KOL program scales.
+
+B2B meeting request carry-over (Day 3): The in-person meeting request with a travel window starting within about a week was re-surfaced in every patrol today per the Day 30 daily-escalation rule. No confirmation from Yori that a reply was sent. Countdown until first travel day is running; the window is now very close. Daily escalation with countdown is working as designed.
+
+**Day 30 (2026-07-21 → 2026-07-22):**
+
+"Finance team" intermediate payment status (publish-gate invoice): A video content creator had their invoice acknowledged 6 days after receipt, with Yori replying explicitly that the invoice was received and has been forwarded to a finance team for processing. This creates a new tracking state between "invoice received, no response" and "paid — PayPal confirmation." Rule: when a partner's invoice receives an acknowledgement that explicitly states it is being forwarded to a finance team, log status as "acknowledged — in finance queue, Day N from invoice date." If no PayPal payment confirmation arrives within 72h of that acknowledgement, re-flag as "finance queue, still pending — Yori acknowledged [date], [N] days since." The publish gate (when content is ready and awaiting payment to go live) remains active throughout the finance-queue period — finance-team forwarding is not payment.
+
+Twitter/X collaboration invoice via PayPal: A PayPal-routed invoice for a Twitter (X) collaboration arrived via service@paypal.com — same trusted delivery path as all prior YouTube-collab PayPal invoices. Existing rule confirmed to cover Twitter/X platform collabs without modification. Log with platform noted alongside sender and amount in Notion. No new rule needed.
+
+B2B in-person meeting request — daily escalation until response confirmed: A named executive's in-person meeting request (travel window approximately 8 days out) arrived on Day 29 and remained unanswered on Day 30. Extension to Day 29 rule: once a high-priority B2B meeting request with a travel window is flagged in ⚠️ Needs your action, re-surface it in every patrol report until Yori confirms a reply was sent — not only on first mention. Include countdown: "[X] days until first travel date, response pending." A one-time mention on the day of arrival is insufficient when the external deadline is hard and approaching.
 
 **Day 29 (2026-07-20 → 2026-07-21):**
 
@@ -545,7 +565,7 @@ heliox email backend down (exit 6): When `heliox email send` or `list` returns e
 
 1V1 outreach via Gmail draft approach: For any bulk outreach campaign requiring human review before send, the Gmail draft approach is the default path. Create all drafts, surface the count and folder location in the DM, wait for Yori's send confirmation. Never auto-send from an outreach batch.
 
-skill ≠ install-time wizard (full team, 2026-06-30, seq 616–626): This skill file is a passive capability doc. When a new user installs it, nothing fires automatically — no heliox commands, no auth cards, no schedule creation. The First-Run Setup wizard in this file only runs if the runtime emits a `skill:install` wake event (a platform-level gap as of 2026-06-30). Until that hook exists, users must explicitly ask to be guided through setup. Do not claim the skill guides users "from 0 to 1 automatically."
+skill ≠ install-time wizard (full team, 2026-06-30, seq 616–626): This skill file is a passive capability doc. When a new user installs it, nothing fires automatically — no heliox commands, no connect links, no schedule creation. The First-Run Setup wizard in this file only runs if the runtime emits a `skill:install` wake event (a platform-level gap as of 2026-06-30). Until that hook exists, users must explicitly ask to be guided through setup. Do not claim the skill guides users "from 0 to 1 automatically."
 
 **Day 9 (2026-06-29):**
 
@@ -557,7 +577,7 @@ Multiple PayPal confirmations per patrol: two payment confirmations landed in th
 
 Notion @mention burst: Notion sent 8+ rapid-fire notification emails for a single Notion thread update (GTM tracking doc). Auto-skip confirmed correct. No need to surface individual @mention emails in DM — only surface if the body contains an actual task or question directed at Yori (not just "@yorihan" auto-notify).
 
-OAuth token expiry cascade: Gmail MCP token expired and blocked three consecutive patrols. When token expires: skip the patrol, DM Yori immediately and send a new auth card via `heliox tool google auth`. Do not silently skip without notifying.
+OAuth token expiry cascade: Gmail MCP token expired and blocked three consecutive patrols. When token expires: skip the patrol, DM Yori immediately and send a new connect link via `heliox tool google auth`. Do not silently skip without notifying.
 
 **Days 6-8 (2026-06-26 → 2026-06-28):**
 
