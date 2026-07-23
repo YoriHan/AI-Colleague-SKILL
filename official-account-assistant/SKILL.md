@@ -7,7 +7,7 @@ description: Turns intent, user data, and raw material into WeChat official acco
 
 # Official Account Assistant
 
-*AI Colleague Skill | Last updated: 2026-07-22 JST (v17 — delta over v15 (sha b3d29465): Dual-Vignette Format added as Pattern 37 subsection; D1 content log updated to Gatlin-cleared (seq 1759), pending Trace + Yori. Everything else v15-verbatim.)*
+*AI Colleague Skill | Last updated: 2026-07-23 JST (v18 — delta over v17 (sha f4c76da8): New Window Raw Data 7/16–22 added; A-Class Case Pool 7/16–22 added; Pattern 30 Flagship-2 row added; Content log 2026-07-23 row added. Everything else v17-verbatim.)*
 
 ---
 
@@ -134,6 +134,36 @@ Approved Patterns are window-specific. When a new digest lands, treat the previo
 
 ---
 
+## New Window Raw Data — 7/16–22
+*(Raw bucket counts from Gatlin's scene digest seq 1858, 2026-07-23 JST. Do not use as copy claims until message-level verification with Gatlin.)*
+
+**Top-level buckets (ranked, internal counts not for public repo):**
+- 研发/开发 (top) · 设计 · 研究/调研 · 内容创作 · 数据/分析 · 规划/管理 · 营销/增长 (bottom)
+
+**Selected direction (seqs 1859–1871, 2026-07-23 JST):** AI 团队编排/orchestration 公众号旗舰文-2
+- Platform: 微信公众号
+- Rationale: Gatlin ran message-level slice on 规划/管理 bucket (7/16–22); true multi-role orchestrators confirmed above 10% flagship threshold (consistent with 7/12–18 window). Story: solo founder dispatches AI colleagues daily (info stream + task lines). Finance/crypto framing out; tender-submission case replaces investment anchor.
+- A-class pool result (Pattern 35 applied): 规划/管理 bucket → verified orchestrators above flagship threshold. See case pool below.
+
+---
+
+## A-Class Case Pool — AI Orchestration (7/16–22)
+*(Gatlin deep slice, seq 1863, 2026-07-23 JST. De-identified per Pattern 29.)*
+
+**① AI 一人公司（hero case）**
+- Trigger: solo founder running multiple parallel task lines; each AI colleague holds one line
+- Orchestration: Each morning, dispatches fixed AI colleagues — one monitors an info stream for updates; others each advance one task line at their own pace; founder only decides and reviews
+- Outcome: Daily dispatch rhythm established; task lines in progress; nothing fully shipped
+
+**② 投标项目（embedded anchor）**
+- Trigger: multi-party tender requiring coordinated review
+- Orchestration: 4-role split — reviewer role is @-triggered only (won't self-initiate)
+- Outcome: Division in progress; result not final
+
+*Pattern 36 applies: both cases are "in motion" — do not write as shipped results.*
+
+---
+
 ## Retired Patterns
 *(Verified wrong or stale — do not use)*
 
@@ -183,6 +213,7 @@ When real user cases are used in showcase articles:
 | D2-next (awareness) | 「组一支 AI 团队，把重复活儿做成自动跑的 skill」 | Agent/Skill 开发; 独立开发者 series continuation | Selected 2026-07-16; drafting next |
 | D5 (awareness) | 「你出想法，AI 团队出稿——非设计师用 AI 出界面和品牌视觉」小红书 | AI-team-for-design showcase; 非设计师 audience; 小红书 platform | Selected 2026-07-18; drafting queue |
 | **Flagship (公众号)** | **「我给三个 AI 同事写了岗位说明书」AI 编排/orchestration** | **Multi-agent orchestration; one-person AI company; highest moat** | **v3 — Gatlin data gate ✅ — Awaiting Yori direction confirmation** |
+| Flagship-2 (公众号) | 「每天早上，他先把活派出去」AI 编排旗舰文-2 | Multi-agent orchestration awareness; 7/16–22 anchor | v2 draft, Gatlin PII cleared; awaiting Yori platform confirmation |
 
 **E2/C1 (no-code CMS long-tail) is downgraded.** Singletons across distinct industries — not a defensible search cluster.
 
@@ -401,11 +432,13 @@ An alternative awareness format for when A-slice is below threshold but B-cluste
 | 2026-07-18 | Direction 5 — AI 团队做設計 | 「你出想法，AI 团队出稿」; 設計 leading sub-bucket (7/11-7/17 presence); 小红书 platform; Pattern 34 caveat applied | Selected 2026-07-18; drafting queue |
 | **2026-07-19** | **AI 编排/orchestration 旗舰文** | **「我给三个 AI 同事写了岗位说明书」; small A-class case pool; hero = AI 一人公司 (synthetic shape); Pattern 35+36 applied** | **v3 — Gatlin data gate ✅ — Awaiting Yori direction confirmation. Artifact: https://app.helio.im/a/6a5ccd2f4a083baa35de98ee** |
 | 2026-07-20–22 | D1: 「两个人，背景天壤之别」公众号 awareness (dual-vignette: 调度者×多线编排 + 增长运营×AI团队做内容) | Draft done (dual-vignette format, paired single-case). Gatlin claim + de-id gate passed (seq 1759); pending Trace exact-diff clearance + Yori final approval. |
+| 2026-07-23 | AI 编排/orchestration 旗舰文-2 | 「每天早上，他先把活派出去」; 7/16–22 window; hero=solo founder morning dispatch; tender submission 4-role anchor; finance/crypto gate applied; Pattern 35+36 applied | v2, Gatlin PII/data gate ✅; awaiting Yori platform confirmation |
 
 ---
 
 ## Changelog
 
+- **v18** (2026-07-23 JST): Delta-fold over v17 (base sha f4c76da8), four blocks, everything else v17-verbatim. (1) New Window Raw Data 7/16–22 (buckets qualitative; raw active-user count kept out of repo per data gate). (2) A-Class Case Pool 7/16–22: hero = solo-founder morning dispatch (info stream + task lines), tender-submission 4-role embedded anchor; both de-identified (Pattern 29) and marked in-motion (Pattern 36); finance/crypto framing out. (3) Pattern 30 Flagship-2 row. (4) Content log 2026-07-23 row. No changes to Patterns 28–37, Topic Selection Rules, Approved/Retired Patterns, prior Case Pool/Window Data, or Red lines.
 - **v17** (2026-07-22 JST): Delta-fold over v15 (base sha b3d29465), two blocks, everything else v15-verbatim. (1) Dual-Vignette Format added as subsection of Pattern 37: alternative awareness format when A-slice is below threshold but B-cluster has two distinct archetypes; parallel single-case stories; red lines on "三条线同时在转", quantity framing, and pair-level Pattern-29 de-identification check. (2) Content log D1 row updated: draft done (dual-vignette), Gatlin claim + de-id gate passed (seq 1759); pending Trace exact-diff clearance + Yori final approval. No changes to Patterns 28–36, Pattern 37 pivot protocol text, Topic Selection Rules, Approved/Retired Patterns, Case Pool, Window Data, or Red lines.
 - **v14** (2026-07-21 JST): Delta-fold over v13 (three blocks, everything else v13-verbatim). Pattern 37 — low-A-slice pivot protocol (below-threshold A → pivot anchor to B-cluster pain, don't abandon; name the pivot; counts stay internal). OAA↔SEO Coordination gains a Timing subsection (publish-window alignment, awareness-first-with-placeholder-CTA, SEO priority order). Content log gains the 7/20 D1 pivot row (qualitative — no slice counts). No changes to v13 Patterns 28–36, Topic Selection Rules, Approved/Retired Patterns, or Red lines. (Supersedes the withdrawn v2.3 full-file replacement, reverted at commit 320c739.)
 - **v13** (2026-07-20 JST): Full public-repo scrub (two reviewer passes, Trace + Gatlin). Contamination rates, distinct counts, threshold counts, workspace/person counts, and singleton counts replaced with qualitative wording throughout. Hero case ① de-id finalized: verbatim quoted prompt removed, trigger paraphrased to synthetic category shape. Pattern 33 committer corrected (Trace → Gatlin). Intentional relative framing preserved (`1 in N`, `≥~10%`).
