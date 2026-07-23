@@ -1,6 +1,6 @@
 # email-genius.md
 **Email Genius — Skill File**
-*AI Colleague Skill | Last updated: 2026-07-23 JST (v21.3 — OAuth connect flow updated for Steps 1 and 2)*
+*AI Colleague Skill | Last updated: 2026-07-24 JST (v21.4 — Day 32: pre-reply open burst rule, persistent unreplied partner escalation, Google Cloud action-required classification)*
 
 ---
 
@@ -332,7 +332,7 @@ Apply this before any post that could end up in a public repo.
 **Pre-publish mechanical scan (nightly, before posting):**
 Before posting the `[skill-update]` message to #gtm_friends, scan the draft content for:
 - Email addresses: any `@` match (whitelist exceptions: `service@paypal.com`, `invoice+statements+acct_*@stripe.com`, `*@payoneer.com`, `GoogleImageProxy` in UA strings, `notify@gmass.co`)
-- Amount patterns: `$\d`, bare currency figures (e.g. `$40`, `$50`)
+- Amount patterns: `$\d`, bare currency figures (e.g. `$<amount>`, `USD <amount>`)
 - Invoice number patterns: `INV-` prefix, or a 4-digit numeric token appearing **within invoice/billing context only** (e.g. directly following "invoice #", "Invoice No", "INV-", "receipt #"); whitelist: standalone years (2018–2035), port numbers in localhost context (e.g. `5001` in `localhost:5001`), and any 4-digit token not adjacent to an invoice/payment keyword
 - Capitalized proper name/company strings: 2+ consecutive capitalized words not in a rule description, code block, or URL; allowlist: Email Genius, Google Image Proxy, PayPal, Stripe, Draft Board, Search Console, PandaDoc, GMass, Gmail, Notion, Helio
 
@@ -389,6 +389,14 @@ Budget reference (approximate, adjust per channel size):
 
 ## Lessons Learned
 
+**Day 32 (2026-07-23 → 2026-07-24):**
+
+Pre-reply open burst — distinct from warm-signal burst: A KOL creator sent a follow-up email, and GMass simultaneously surfaced 4 rapid open notifications within a 22-second window (browser: Firefox, Unknown location). These are genuine human opens (no GoogleImageProxy UA, not Google IP range), but they coincide with the exact moment the partner composed and sent their message — the contact opened the email to read context while drafting their reply. Rule: when an open burst (3+ opens within 30 seconds) arrives within 60 seconds of an actual reply from the same contact, classify as "pre-reply reads" — genuine opens that count toward totals, but not a separate warm-signal event. Do not surface the opens as a warm signal in the patrol report when the associated reply is already there. The burst and the reply are one event. This is distinct from the Day 24 active-review burst (which predicts a reply about to arrive) — here the reply has already arrived.
+
+Persistent unreplied partner (new escalation class): A KOL creator who responded positively to outreach on Day 1 sent their 4th email (3 follow-ups) over 49 days with no outbound reply visible in our sent folder. Current rules track aging of items we're waiting on; this is the reverse — a willing creator escalating follow-ups while we're silent. Rule: during each patrol, check KOL inbound threads for cases where the partner has sent 3+ emails with no matching sent reply from us (verify via thread sent-message presence). Surface as "persistent unreplied partner — [N] follow-ups, Day [X] since first reply" in ⚠️ Needs your action. Include original context (their first reply date, what they offered). Suggested action at 3+ follow-ups: if still interested, draft a reply acknowledging the gap and re-engaging; if moving on, a brief decline is cleaner than continued silence and protects sender reputation. Silence past 3+ partner follow-ups is both a relationship risk and a reputation signal to the creator community.
+
+Google Cloud compliance notification — surface, don't skip: A Google Cloud notification arrived with subject "[Action Required] Enable 2-step verification to maintain your access to the Google Cloud console." This is distinct from routine Google product notifications (Workspace, Calendar, Drive, Search Console crawl/feature alerts) which auto-skip. Rule: Google Cloud security and compliance notifications with "[Action Required]" or "[Action Needed]" bracket phrase in the subject should be surfaced in ⚠️ Needs your action, not auto-skipped. The bracket phrase is the distinguishing signal — routine Google Cloud billing summaries and feature announcements (no bracket phrase) continue to auto-skip. The Vercel 2SV security sequence (Day 22) established the precedent for bracket-phrase security emails; this extends it to Google Cloud platform compliance.
+
 **Day 31 (2026-07-22 → 2026-07-23):**
 
 Promo code collision (new email type): A product partner reported that a promo code provided to them was invalid, with an error suggesting it had already been redeemed by a different account email. Investigation revealed the same code appeared to be consumed by a conflicting registration. Rule: when a KOL or product partner reports a promo code as invalid, do not immediately assume a technical error — check whether the code may have been claimed by another account first. Log: the code reference, the email address the partner used to register, and the error symptom. Escalate to Yori as "promo code conflict — requires new code or manual account upgrade." Do not auto-promise a replacement code. File under ⚠️ Needs your action. This is distinct from a general product support request — it involves Yori's KOL relationship and requires a manual resolution path.
@@ -407,7 +415,7 @@ B2B meeting request carry-over (Day 3): The in-person meeting request with a tra
 
 Twitter/X collaboration invoice via PayPal: A PayPal-routed invoice for a Twitter (X) collaboration arrived via service@paypal.com — same trusted delivery path as all prior YouTube-collab PayPal invoices. Existing rule confirmed to cover Twitter/X platform collabs without modification. Log with platform noted alongside sender and amount in Notion. No new rule needed.
 
-B2B in-person meeting request — daily escalation until response confirmed: A named executive's in-person meeting request (travel window approximately 8 days out) arrived on Day 29 and remained unanswered on Day 30. Extension to Day 29 rule: once a high-priority B2B meeting request with a travel window is flagged in ⚠️ Needs your action, re-surface it in every patrol report until Yori confirms a reply was sent — not only on first mention. Include countdown: "[X] days until first travel date, response pending." A one-time mention on the day of arrival is insufficient when the external deadline is hard and approaching.
+B2B in-person meeting request — daily escalation until response confirmed: An executive's in-person meeting request (travel window approximately 8 days out) arrived on Day 29 and remained unanswered on Day 30. Extension to Day 29 rule: once a high-priority B2B meeting request with a travel window is flagged in ⚠️ Needs your action, re-surface it in every patrol report until Yori confirms a reply was sent — not only on first mention. Include countdown: "[X] days until first travel date, response pending." A one-time mention on the day of arrival is insufficient when the external deadline is hard and approaching.
 
 **Day 29 (2026-07-20 → 2026-07-21):**
 
