@@ -7,7 +7,7 @@ description: Turns intent, user data, and raw material into WeChat official acco
 
 # Official Account Assistant
 
-*AI Colleague Skill | Last updated: 2026-07-23 JST (v18 — delta over v17 (sha f4c76da8): New Window Raw Data 7/16–22 added; A-Class Case Pool 7/16–22 added; Pattern 30 Flagship-2 row added; Content log 2026-07-23 row added. Everything else v17-verbatim.)*
+*AI Colleague Skill | Last updated: 2026-07-24 JST (v19 — delta over v18 (sha 54b94f1f): New Window Raw Data 7/17–23 added; Content log 2026-07-24 row added. Everything else v18-verbatim.)*
 
 ---
 
@@ -161,6 +161,20 @@ Approved Patterns are window-specific. When a new digest lands, treat the previo
 - Outcome: Division in progress; result not final
 
 *Pattern 36 applies: both cases are "in motion" — do not write as shipped results.*
+
+---
+
+## New Window Raw Data — 7/17–23
+*(Raw bucket counts from Gatlin's scene digest seq 1952, 2026-07-24 00:09 JST. Do not use as copy claims until message-level verification with Gatlin.)*
+
+**Top-level buckets (ranked, internal counts not for public repo):**
+- 研发/开发 (top) · 设计 · 研究/调研 · 内容创作 · 数据/分析 · 规划/管理 · 营销/增长 (bottom)
+
+**Sub-bucket analysis (2026-07-24 JST):**
+- 搭后台/CMS: A/B/C slice run (seqs 1954–1956, 2026-07-24 JST), consistent with 7/20 result (thread 1666). Persona mismatch — entries skew PM/tech-director, not non-technical founder ICP; A-slice below flagship threshold. Eliminated. No pivot warranted (Flagship-2 direction already held).
+- **Next candidate flagged:** 数据/脚本自动化 (three sub-buckets combined). Message-level slice pending before direction selection.
+
+**Direction status (2026-07-24 JST):** No new direction selected. 多角色编排 Flagship-2 hero opener held; awaiting Yori platform confirmation before proceeding.
 
 ---
 
@@ -433,11 +447,13 @@ An alternative awareness format for when A-slice is below threshold but B-cluste
 | **2026-07-19** | **AI 编排/orchestration 旗舰文** | **「我给三个 AI 同事写了岗位说明书」; small A-class case pool; hero = AI 一人公司 (synthetic shape); Pattern 35+36 applied** | **v3 — Gatlin data gate ✅ — Awaiting Yori direction confirmation. Artifact: https://app.helio.im/a/6a5ccd2f4a083baa35de98ee** |
 | 2026-07-20–22 | D1: 「两个人，背景天壤之别」公众号 awareness (dual-vignette: 调度者×多线编排 + 增长运营×AI团队做内容) | Draft done (dual-vignette format, paired single-case). Gatlin claim + de-id gate passed (seq 1759); pending Trace exact-diff clearance + Yori final approval. |
 | 2026-07-23 | AI 编排/orchestration 旗舰文-2 | 「每天早上，他先把活派出去」; 7/16–22 window; hero=solo founder morning dispatch; tender submission 4-role anchor; finance/crypto gate applied; Pattern 35+36 applied | v2, Gatlin PII/data gate ✅; awaiting Yori platform confirmation |
+| 2026-07-24 | 7/17–23 window review; OAA contribution to AI-colleague master doc | 搭后台/CMS A/B/C confirmed eliminated (seqs 1954–1956); 数据/脚本自动化 flagged as next candidate (slice pending); Flagship-2 hero opener held awaiting Yori; OAA section contributed to Gatlin v1.2 AI-colleague usage master doc | Holding — Flagship-2 awaiting Yori platform confirmation |
 
 ---
 
 ## Changelog
 
+- **v19** (2026-07-24 JST): Delta-fold over v18 (base sha 54b94f1f), two blocks, everything else v18-verbatim. (1) New Window Raw Data 7/17–23: 搭后台/CMS A/B/C slice confirmed elimination (persona mismatch, A-slice below flagship threshold, consistent with 7/20), 数据/脚本自动化 flagged as next candidate (slice pending). (2) Content log 2026-07-24 row. No changes to Patterns 28–37, Topic Selection Rules, Approved/Retired Patterns, Case Pools, prior Window Data, or Red lines.
 - **v18** (2026-07-23 JST): Delta-fold over v17 (base sha f4c76da8), four blocks, everything else v17-verbatim. (1) New Window Raw Data 7/16–22 (buckets qualitative; raw active-user count kept out of repo per data gate). (2) A-Class Case Pool 7/16–22: hero = solo-founder morning dispatch (info stream + task lines), tender-submission 4-role embedded anchor; both de-identified (Pattern 29) and marked in-motion (Pattern 36); finance/crypto framing out. (3) Pattern 30 Flagship-2 row. (4) Content log 2026-07-23 row. No changes to Patterns 28–37, Topic Selection Rules, Approved/Retired Patterns, prior Case Pool/Window Data, or Red lines.
 - **v17** (2026-07-22 JST): Delta-fold over v15 (base sha b3d29465), two blocks, everything else v15-verbatim. (1) Dual-Vignette Format added as subsection of Pattern 37: alternative awareness format when A-slice is below threshold but B-cluster has two distinct archetypes; parallel single-case stories; red lines on "三条线同时在转", quantity framing, and pair-level Pattern-29 de-identification check. (2) Content log D1 row updated: draft done (dual-vignette), Gatlin claim + de-id gate passed (seq 1759); pending Trace exact-diff clearance + Yori final approval. No changes to Patterns 28–36, Pattern 37 pivot protocol text, Topic Selection Rules, Approved/Retired Patterns, Case Pool, Window Data, or Red lines.
 - **v14** (2026-07-21 JST): Delta-fold over v13 (three blocks, everything else v13-verbatim). Pattern 37 — low-A-slice pivot protocol (below-threshold A → pivot anchor to B-cluster pain, don't abandon; name the pivot; counts stay internal). OAA↔SEO Coordination gains a Timing subsection (publish-window alignment, awareness-first-with-placeholder-CTA, SEO priority order). Content log gains the 7/20 D1 pivot row (qualitative — no slice counts). No changes to v13 Patterns 28–36, Topic Selection Rules, Approved/Retired Patterns, or Red lines. (Supersedes the withdrawn v2.3 full-file replacement, reverted at commit 320c739.)
