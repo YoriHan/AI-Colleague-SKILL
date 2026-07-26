@@ -7,7 +7,7 @@ description: Turns intent, user data, and raw material into WeChat official acco
 
 # Official Account Assistant
 
-*AI Colleague Skill | Last updated: 2026-07-25 JST (v20 — delta over v19 (sha c0ab015d): New Window Raw Data 7/18–24 added; Content log 2026-07-25 row added. Everything else v19-verbatim.)*
+*AI Colleague Skill | Last updated: 2026-07-26 JST (v21 — delta over v20 (sha 80630933): raw automation ID removed from the Pattern 33 intro line and the OAA automation fields block, replaced with a runtime-lookup note; Content log 2026-07-19 artifact link converted to title+seq; raw channel-id URIs replaced with plain channel-name text; digest cadence time dropped from the workflow step. Everything else v20-verbatim.)*
 
 ---
 
@@ -35,7 +35,7 @@ My lane:
 
 ## Daily pipeline
 
-1. **Wait for Gatlin's daily scene digest** (daily ~09:08 JST via automation, published in [#gtm_friends](helio://channel/6a39f2862db71a2d0b485fea)). This is the factual foundation — don't proceed without it.
+1. **Wait for Gatlin's daily scene digest** (posted daily via automation in #gtm_friends). This is the factual foundation — don't proceed without it.
 2. **Select topic direction** from the top 3–5 suggestions in the digest (see Topic Selection Rules below). Post your pick with brief rationale.
 3. **Run Gatlin A/B/C slice** on the chosen bucket before anchoring the article structure (see Pattern 35). Adjust structure to fit actual A-class case count.
 4. **Draft** using the approved Patterns below; mark any unsupported claim with `[NEEDS DATA]`.
@@ -280,7 +280,7 @@ grep -En '\b[ABC][ -]*(slice|class)?[^=]{0,120}= *[0-9]|\([ABC] *= *[0-9]' SKILL
 Zero matches required before push. Any hit is a Pattern 32 violation — replace with qualitative language ("below threshold", "largest cluster") and re-run before committing. Catches the `X-slice … = N` standalone form (including words between the label and the equals, e.g. a slice label followed by a bucket name then a count) and the `(X=N` paren form that slipped on 7/20. It is a mechanical backstop for those shapes, NOT a substitute for content review — colon (`X: N`) or number-first (`N X-class`) leak shapes won't match. Intentional relative framing (`≥~10%`, `1 in N`) does not match.
 
 ## Pattern 33 — Gated-push procedure model (added v9, 2026-07-16)
-Covers how the nightly OAA skill-update automation (`6a3df45e`) hands off to GitHub commit via Gatlin.
+Covers how the nightly OAA skill-update automation hands off to GitHub commit via Gatlin.
 
 **Split-procedure model (Procedure A + B):**
 - **Procedure A (cron turn):** Post skill-update message in #gtm_friends → attach file → open handoff state → stop. The cron run ends here; no blocking wait inside the run.
@@ -307,9 +307,9 @@ The cron must NOT block inside its own run waiting for async human approval or t
 The leak vector: a draft headline, hook, or structural fragment surviving verbatim into the distilled skill when it should stay session-local. The reviewer re-greps for these string classes on each OAA commit.
 
 **OAA automation fields:**
-- Automation ID: `6a3df45e5ac8e5380009bda0`
 - Repo path: `official-account-assistant/SKILL.md`
 - Executor: OAA; token-holder for GitHub push: Gatlin
+- Automation ID / schedule state: not stored here — resolve via `heliox automation list` / `heliox automation show` at runtime. A versioned skill file should carry no value whose truth lives in a running system (same class as the next_run_at strip applied to a peer skill file; an earlier version of this file hardcoded an automation status line, removed in the v13 scrub).
 
 ## Pattern 34 — Presence-label vs. message-level slice (added v10, 2026-07-18)
 Presence labels (keyword-tagged aggregated counts) and message-level deep slices are **not interchangeable**. Applies to all content-direction decisions, not just automation or research.
@@ -460,7 +460,7 @@ An alternative awareness format for when A-slice is below threshold but B-cluste
 | 2026-07-14 | Direction 6 — 定时任务/日程提醒 | 「设一次，AI 团队每天替你跑」; helio_automation launch angle; Pattern 32 confirmed | Draft in progress; Gatlin sub-bucket verify pending |
 | 2026-07-16 | Direction #2 — Agent/Skill 开发 | 「组一支 AI 团队，把重复活儿做成自动跑的 skill」; 7/09-7/15 data | Selected; drafting queue |
 | 2026-07-18 | Direction 5 — AI 团队做設計 | 「你出想法，AI 团队出稿」; 設計 leading sub-bucket (7/11-7/17 presence); 小红书 platform; Pattern 34 caveat applied | Selected 2026-07-18; drafting queue |
-| **2026-07-19** | **AI 编排/orchestration 旗舰文** | **「我给三个 AI 同事写了岗位说明书」; small A-class case pool; hero = AI 一人公司 (synthetic shape); Pattern 35+36 applied** | **v3 — Gatlin data gate ✅ — Awaiting Yori direction confirmation. Artifact: https://app.helio.im/a/6a5ccd2f4a083baa35de98ee** |
+| **2026-07-19** | **AI 编排/orchestration 旗舰文** | **「我给三个 AI 同事写了岗位说明书」; small A-class case pool; hero = AI 一人公司 (synthetic shape); Pattern 35+36 applied** | **v3 — Gatlin data gate ✅ — Awaiting Yori direction confirmation. Artifact: 《我给三个 AI 同事写了岗位说明书》(旗舰文 v3) — see seq 1591/1597** |
 | 2026-07-20–22 | D1: 「两个人，背景天壤之别」公众号 awareness (dual-vignette: 调度者×多线编排 + 增长运营×AI团队做内容) | Draft done (dual-vignette format, paired single-case). Gatlin claim + de-id gate passed (seq 1759); pending Trace exact-diff clearance + Yori final approval. |
 | 2026-07-23 | AI 编排/orchestration 旗舰文-2 | 「每天早上，他先把活派出去」; 7/16–22 window; hero=solo founder morning dispatch; tender submission 4-role anchor; finance/crypto gate applied; Pattern 35+36 applied | v2, Gatlin PII/data gate ✅; awaiting Yori platform confirmation |
 | 2026-07-24 | 7/17–23 window review; OAA contribution to AI-colleague master doc | 搭后台/CMS A/B/C confirmed eliminated (seqs 1954–1956); 数据/脚本自动化 flagged as next candidate (slice pending); Flagship-2 hero opener held awaiting Yori; OAA section contributed to Gatlin v1.2 AI-colleague usage master doc | Holding — Flagship-2 awaiting Yori platform confirmation |
@@ -470,6 +470,7 @@ An alternative awareness format for when A-slice is below threshold but B-cluste
 
 ## Changelog
 
+- **v21** (2026-07-26 JST): Delta-fold over v20 (base sha 80630933), de-identification only, everything else v20-verbatim. (1) Raw automation ID removed from both places it appeared — the Pattern 33 intro line and the OAA automation fields block — replaced with a runtime-lookup note: a versioned skill file carries no value whose truth lives in a running system. (2) Content log 2026-07-19 artifact URL converted to title + seq pointer (org-gated link in a public-repo file is provenance, not an intentionally shared artifact). (3) Raw channel-id URIs in the workflow step and the v6 changelog line replaced with plain channel-name text — same class as the automation ID: internal plumbing does not belong in a public-repo file. (4) The digest cadence time dropped from the workflow step; the step's instruction is to wait for the digest, and the schedule itself lives in the automation. No content-direction changes; no changes to Patterns 28–37, Topic Selection Rules, Approved/Retired Patterns, Case Pools, Window Data, Red lines, or any other Content log row.
 - **v20** (2026-07-25 JST): Delta-fold over v19 (base sha c0ab015d), two blocks, everything else v19-verbatim. (1) New Window Raw Data 7/18–24: 数据/报表/看板 candidate sliced and eliminated (below threshold; no common reader across three unrelated domains); skill/agent re-sliced and reconfirmed eliminated (below threshold, two windows running now); 规划/管理 base bucket softened, flagship slice unaffected. Bucket percentages, active-user count, and slice ratios kept qualitative per Pattern 32 / data gate. (2) Content log 2026-07-25 row. No changes to Patterns 28–37, Topic Selection Rules, Approved/Retired Patterns, Case Pools, prior Window Data, or Red lines.
 - **v19** (2026-07-24 JST): Delta-fold over v18 (base sha 54b94f1f), two blocks, everything else v18-verbatim. (1) New Window Raw Data 7/17–23: 搭后台/CMS A/B/C slice confirmed elimination (persona mismatch, A-slice below flagship threshold, consistent with 7/20), 数据/脚本自动化 flagged as next candidate (slice pending). (2) Content log 2026-07-24 row. No changes to Patterns 28–37, Topic Selection Rules, Approved/Retired Patterns, Case Pools, prior Window Data, or Red lines.
 - **v18** (2026-07-23 JST): Delta-fold over v17 (base sha f4c76da8), four blocks, everything else v17-verbatim. (1) New Window Raw Data 7/16–22 (buckets qualitative; raw active-user count kept out of repo per data gate). (2) A-Class Case Pool 7/16–22: hero = solo-founder morning dispatch (info stream + task lines), tender-submission 4-role embedded anchor; both de-identified (Pattern 29) and marked in-motion (Pattern 36); finance/crypto framing out. (3) Pattern 30 Flagship-2 row. (4) Content log 2026-07-23 row. No changes to Patterns 28–37, Topic Selection Rules, Approved/Retired Patterns, prior Case Pool/Window Data, or Red lines.
@@ -482,7 +483,7 @@ An alternative awareness format for when A-slice is below threshold but B-cluste
 - **v9** (2026-07-17 00:01 JST): 7/09–7/15 window raw data. Direction #2 Agent/Skill 开发 selected (seq 1410). Pattern 33 — gated-push procedure model: split-procedure (Procedure A: cron posts+stops; Procedure B: separate reviewer sign-off trigger), reviewer-role correction (content-gate first, blob-sha second), fail-closed + completeness invariant, OAA leak-class list declared (seq 1392). D2-next line added to Pattern 30 content plan. 7/16 content log entry.
 - **v8** (2026-07-15 00:00 JST): Pattern 32 — automation framing gate. Records 7/07–7/13 raw window data (unverified). Direction 6 selected. 7/6–7/12 Approved Patterns marked EXPIRED. D6 line added to Pattern 30. 7/14 content log entry.
 - **v7** (2026-07-14 00:00 JST): Pattern 28 — 用户/需求調研 permanently eliminated. Pattern 29 — solo-builder showcase format + PII/consent gate. Pattern 30 — three-content-line model; E2/C1 CMS long-tail downgraded. Pattern 31 — YMYL gate. Updated Approved Patterns for 7/6–7/12 window. Growth-delegation threshold formalized. 7/13 content log entries.
-- **v6** (2026-07-13 00:00 JST): Pattern 27 — sub-bucket selection rule. OAA↔SEO two-lane coordination model. Fixed: #yoris_friends → [#gtm_friends](helio://channel/6a39f2862db71a2d0b485fea).
+- **v6** (2026-07-13 00:00 JST): Pattern 27 — sub-bucket selection rule. OAA↔SEO two-lane coordination model. Fixed: #yoris_friends → #gtm_friends.
 - **v5.1** (2026-07-12 00:12 JST): Corrected research clean base; stale narrow-window distinct count retired; correct figure = 市场∪用户調研 distinct union (7/4-7/10).
 - **v5** (2026-07-12 00:00 JST): Added Approved Patterns from 7/4-7/10 window; SEO gate added to pipeline.
 - **v4 and earlier**: Successive additions of cohort resurge discipline, SEO gate spec, pre-flight self-check rules.
