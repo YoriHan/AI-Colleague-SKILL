@@ -7,7 +7,7 @@ description: Turns intent, user data, and raw material into WeChat official acco
 
 # Official Account Assistant
 
-*AI Colleague Skill | Last updated: 2026-07-24 JST (v19 — delta over v18 (sha 54b94f1f): New Window Raw Data 7/17–23 added; Content log 2026-07-24 row added. Everything else v18-verbatim.)*
+*AI Colleague Skill | Last updated: 2026-07-25 JST (v20 — delta over v19 (sha c0ab015d): New Window Raw Data 7/18–24 added; Content log 2026-07-25 row added. Everything else v19-verbatim.)*
 
 ---
 
@@ -175,6 +175,22 @@ Approved Patterns are window-specific. When a new digest lands, treat the previo
 - **Next candidate flagged:** 数据/脚本自动化 (three sub-buckets combined). Message-level slice pending before direction selection.
 
 **Direction status (2026-07-24 JST):** No new direction selected. 多角色编排 Flagship-2 hero opener held; awaiting Yori platform confirmation before proceeding.
+
+---
+
+## New Window Raw Data — 7/18–24
+*(Raw bucket counts from Gatlin's scene digest seq 1973, 2026-07-25 00:10 JST. Do not use as copy claims until message-level verification with Gatlin.)*
+
+**Top-level buckets (ranked, internal counts not for public repo):**
+- 研发/开发 (top) · 设计 · 内容创作 ≈ 研究/调研 (tied) · 数据/分析 · 规划/管理 · 营销/增长 (bottom)
+
+**Sub-bucket analysis (2026-07-25 JST):**
+- **数据/报表/看板** (bucket grew this window): message-level slice run (seq 1975, 2026-07-25 JST). True continuous production below threshold; even counting half-cases it does not clear 承接, and the qualifying cases span three unrelated domains (美股投资信息看板 / 社媒数据回收看板 / 工程造价 Excel 批量重算) — no common reader. Not flagship-viable either. **Eliminated.** The apparent growth was a bucket-width artifact — most keyword hits were pure mismatches — not real demand.
+- **管理系统·后台** (largest sub-bucket this window): re-confirms 7/20 elimination (persona mismatch, non-technical-founder ICP fails) — no new slice needed; bucket-size growth is keyword width, not demand.
+- **skill/agent**: re-sliced (seq 1977, 2026-07-25 JST). True self-build-and-advance below threshold and weaker than the 7/9–15 window; roughly half the keyword hits were mismatches ("skill" caught as a common English word). **Eliminated**, now confirmed dead across two windows.
+- **规划/管理** (Flagship-1 base bucket) softened this window — does not affect the 7/16–22 slice result (A-slice above flagship threshold, flagship stands); do not frame copy as "usage growing."
+
+**Direction status (2026-07-25 JST):** No new direction opened. Both candidate buckets this window (数据/报表/看板, skill/agent) closed out negative. Four windows running now with only 多角色编排 clearing threshold. v2 (ai-team-orchestration-v2.md) remains the only ready draft — gated on Yori's platform decision, not on missing material. OAA held off drafting 数据/报表/看板 pending Gatlin's slice (seq 1974), then withdrew the proposal cleanly once the slice came back negative (seq 1976) — no wasted drafting cycle.
 
 ---
 
@@ -448,11 +464,13 @@ An alternative awareness format for when A-slice is below threshold but B-cluste
 | 2026-07-20–22 | D1: 「两个人，背景天壤之别」公众号 awareness (dual-vignette: 调度者×多线编排 + 增长运营×AI团队做内容) | Draft done (dual-vignette format, paired single-case). Gatlin claim + de-id gate passed (seq 1759); pending Trace exact-diff clearance + Yori final approval. |
 | 2026-07-23 | AI 编排/orchestration 旗舰文-2 | 「每天早上，他先把活派出去」; 7/16–22 window; hero=solo founder morning dispatch; tender submission 4-role anchor; finance/crypto gate applied; Pattern 35+36 applied | v2, Gatlin PII/data gate ✅; awaiting Yori platform confirmation |
 | 2026-07-24 | 7/17–23 window review; OAA contribution to AI-colleague master doc | 搭后台/CMS A/B/C confirmed eliminated (seqs 1954–1956); 数据/脚本自动化 flagged as next candidate (slice pending); Flagship-2 hero opener held awaiting Yori; OAA section contributed to Gatlin v1.2 AI-colleague usage master doc | Holding — Flagship-2 awaiting Yori platform confirmation |
+| 2026-07-25 | 7/18–24 window review; two candidate buckets closed out | 数据/报表/看板 sliced and eliminated (below threshold; no common reader across three unrelated domains, seq 1975); skill/agent re-sliced and reconfirmed eliminated (below threshold, weaker than 7/9–15, seq 1977); 规划/管理 base bucket softened but flagship slice unaffected | Holding — v2 still the only ready draft, awaiting Yori platform confirmation |
 
 ---
 
 ## Changelog
 
+- **v20** (2026-07-25 JST): Delta-fold over v19 (base sha c0ab015d), two blocks, everything else v19-verbatim. (1) New Window Raw Data 7/18–24: 数据/报表/看板 candidate sliced and eliminated (below threshold; no common reader across three unrelated domains); skill/agent re-sliced and reconfirmed eliminated (below threshold, two windows running now); 规划/管理 base bucket softened, flagship slice unaffected. Bucket percentages, active-user count, and slice ratios kept qualitative per Pattern 32 / data gate. (2) Content log 2026-07-25 row. No changes to Patterns 28–37, Topic Selection Rules, Approved/Retired Patterns, Case Pools, prior Window Data, or Red lines.
 - **v19** (2026-07-24 JST): Delta-fold over v18 (base sha 54b94f1f), two blocks, everything else v18-verbatim. (1) New Window Raw Data 7/17–23: 搭后台/CMS A/B/C slice confirmed elimination (persona mismatch, A-slice below flagship threshold, consistent with 7/20), 数据/脚本自动化 flagged as next candidate (slice pending). (2) Content log 2026-07-24 row. No changes to Patterns 28–37, Topic Selection Rules, Approved/Retired Patterns, Case Pools, prior Window Data, or Red lines.
 - **v18** (2026-07-23 JST): Delta-fold over v17 (base sha f4c76da8), four blocks, everything else v17-verbatim. (1) New Window Raw Data 7/16–22 (buckets qualitative; raw active-user count kept out of repo per data gate). (2) A-Class Case Pool 7/16–22: hero = solo-founder morning dispatch (info stream + task lines), tender-submission 4-role embedded anchor; both de-identified (Pattern 29) and marked in-motion (Pattern 36); finance/crypto framing out. (3) Pattern 30 Flagship-2 row. (4) Content log 2026-07-23 row. No changes to Patterns 28–37, Topic Selection Rules, Approved/Retired Patterns, prior Case Pool/Window Data, or Red lines.
 - **v17** (2026-07-22 JST): Delta-fold over v15 (base sha b3d29465), two blocks, everything else v15-verbatim. (1) Dual-Vignette Format added as subsection of Pattern 37: alternative awareness format when A-slice is below threshold but B-cluster has two distinct archetypes; parallel single-case stories; red lines on "三条线同时在转", quantity framing, and pair-level Pattern-29 de-identification check. (2) Content log D1 row updated: draft done (dual-vignette), Gatlin claim + de-id gate passed (seq 1759); pending Trace exact-diff clearance + Yori final approval. No changes to Patterns 28–36, Pattern 37 pivot protocol text, Topic Selection Rules, Approved/Retired Patterns, Case Pool, Window Data, or Red lines.
