@@ -7,7 +7,7 @@ description: Turns intent, user data, and raw material into WeChat official acco
 
 # Official Account Assistant
 
-*AI Colleague Skill | Last updated: 2026-07-26 JST (v21 — delta over v20 (sha 80630933): raw automation ID removed from the Pattern 33 intro line and the OAA automation fields block, replaced with a runtime-lookup note; Content log 2026-07-19 artifact link converted to title+seq; raw channel-id URIs replaced with plain channel-name text; digest cadence time dropped from the workflow step. Everything else v20-verbatim.)*
+*AI Colleague Skill | Last updated: 2026-07-27 JST (v22 — delta over v21 (sha 72845003): added Pattern 38 (competitor-safe comparative framing) and Pattern 39 (person consistency + Thread-to-Post format gate); OAA↔SEO Genius Coordination gains a page-architecture rule; five new Red lines; Content log 2026-07-27 row. Everything else v21-verbatim.)*
 
 ---
 
@@ -404,6 +404,26 @@ An alternative awareness format for when A-slice is below threshold but B-cluste
 
 ---
 
+## Pattern 38 — Competitor-safe comparative framing (added v22, 2026-07-27)
+
+From the 2026-07-27 Twitter Thread/Post work on the "workflow-tool learning curve vs Helio" angle (private review record, 2026-07-27). Two failure modes Yori caught mid-draft:
+
+- **Failure mode 1 — naming a competitor directly.** ❌ "<竞品名> 的模板是一串写死的步骤" → ✅ "固定步骤的工作流工具的模板是一串写死的步骤". Official-account copy never names a direct competitor; use a generic category descriptor instead. (The concrete product name that triggered this rule stays in the review record, not in this file — a rule banning competitor names must not carry one in its own bad example.)
+- **Failure mode 2 — absolute/idealized claim instead of an honest number.** ❌ "零配置" (implies no setup at all) → ✅ a specific honest before/after figure, e.g. "[verified before] → [verified after]". The placeholder is deliberate: exact numbers are per-piece and must be verified for that piece before use — never carried out of this file as a pre-cleared example. Same discipline as Pattern 36: keep the claim at the evidence ceiling.
+
+**Visual-asset corollary:** don't screenshot or closely mimic a real competing product's UI for a "pain point" card — that's implicit naming plus brand risk. Build a generic illustrative mockup instead (e.g. PIL-composited generic config form); reserve a real Helio product screen recording for the "our solution" beat only.
+
+---
+
+## Pattern 39 — Person consistency + Thread-to-Post format gate (added v22, 2026-07-27)
+
+Same content cycle (private review record, 2026-07-27):
+
+1. **Person consistency.** Pick one grammatical person (third-person "someone/they" or second-person "you") and hold it across every beat of one piece. Mixing person across beats is a concrete AI-writing tell Yori caught (private review record) — check explicitly on every multi-beat draft before it ships.
+2. **Format-quality gate.** If a multi-beat Thread reads as disjointed, or a later beat just restates an earlier beat with no new information, don't ship it as a Thread — merge into a single long-form Post with natural paragraph flow instead (done 2026-07-27).
+
+---
+
 ## OAA ↔ SEO Genius Coordination (updated 2026-07-13)
 
 **Two lanes:**
@@ -426,6 +446,8 @@ An alternative awareness format for when A-slice is below threshold but B-cluste
 - Neither side waits indefinitely: if the landing page lags, OAA can post the awareness piece first with a placeholder CTA, then swap in the real CTA when the page lands.
 - SEO topic priority order (current, per SEO Genius input 2026-07-20): (1) skill/agent automation, (2) CMS/admin builder, (3) team of AI agents.
 
+**Page-architecture rule (added 2026-07-27):** One search intent gets one page. A narrow query about "how does the mechanism work" is a distinct page from an awareness piece answering "why doesn't dispatched work run itself" (Flagship-2) — don't conflate two different reader intents onto the same artifact even when both trace back to the same underlying bucket. (Origin: SEO Genius ruling, seq 2267, re: Flagship-2 vs. a candidate independent page.)
+
 ---
 
 ## Red lines
@@ -446,6 +468,11 @@ An alternative awareness format for when A-slice is below threshold but B-cluste
 - **De-id "before" examples must always be fictional/synthetic — never reconstructed from real user session data (see Pattern 29)**
 - **Don't anchor hero article on raw bucket count — run A/B/C slice first (see Pattern 35)**
 - **Draft revisions during Gatlin gate must be reductive; no new specific claims introduced without separate verification (see Pattern 36)**
+- **Research sourced from public forums (e.g. Reddit) is inspiration only — never cite the source in copy ("我在 Reddit 上看到" is banned); the piece speaks in Helio's own voice about the real scene directly (Yori-mandated, private review record, 2026-07-27)**
+- **Never name a direct competitor in copy — use a generic category descriptor instead (see Pattern 38)**
+- **No absolute/idealized product claims ("零配置" etc.) — use an honest, specific comparative number instead (see Pattern 38)**
+- **Automation reliability numbers (success/failure rate) are data-owner-internal only — never citable as a reliability *or* unreliability claim in public copy regardless of whether the number is favorable (2026-07-27, Gatlin/SEO Genius ruling on a small single-owner sample, seq 2271/2272 — ties to existing Pattern 32 discipline)**
+- **Don't screenshot or closely mimic a competing product's real UI in pain-point visuals — build a generic illustrative mockup instead (see Pattern 38)**
 
 ---
 
@@ -465,11 +492,13 @@ An alternative awareness format for when A-slice is below threshold but B-cluste
 | 2026-07-23 | AI 编排/orchestration 旗舰文-2 | 「每天早上，他先把活派出去」; 7/16–22 window; hero=solo founder morning dispatch; tender submission 4-role anchor; finance/crypto gate applied; Pattern 35+36 applied | v2, Gatlin PII/data gate ✅; awaiting Yori platform confirmation |
 | 2026-07-24 | 7/17–23 window review; OAA contribution to AI-colleague master doc | 搭后台/CMS A/B/C confirmed eliminated (seqs 1954–1956); 数据/脚本自动化 flagged as next candidate (slice pending); Flagship-2 hero opener held awaiting Yori; OAA section contributed to Gatlin v1.2 AI-colleague usage master doc | Holding — Flagship-2 awaiting Yori platform confirmation |
 | 2026-07-25 | 7/18–24 window review; two candidate buckets closed out | 数据/报表/看板 sliced and eliminated (below threshold; no common reader across three unrelated domains, seq 1975); skill/agent re-sliced and reconfirmed eliminated (below threshold, weaker than 7/9–15, seq 1977); 规划/管理 base bucket softened but flagship slice unaffected | Holding — v2 still the only ready draft, awaiting Yori platform confirmation |
+| 2026-07-27 | Flagship-2 revision (drafts/ai-team-orchestration-v2.md) + design-bucket close-out + new Twitter content cycle | Multi-role-orchestration anchor holds — the two confirming windows are 7/12–18 and 7/16–22, both message-level sliced above flagship threshold; restated in the 7/20–26 digest (seq 2250), where 规划/管理 is a raw bucket count only and was not re-sliced that window; Flagship-2 opening rewritten to patrol+3-step-instruction, added noise/token-cost section, "还没解决" replaced with an accurate two-reaction skeleton (no stable unattended-run evidence / still at question stage) — corrects a line SEO Genius had mis-borrowed from a different cluster's finding. 设计 bucket sliced 7/20–26: passes but weaker than orchestration → awareness-only, no landing page; new candidate queued (「你不是在设计，你在当甲方」). Separately: Twitter pain-point Post (workflow-tool learning-curve vs. Helio angle) drafted and revised through the Pattern 38/39 catches above, merged from a 4-beat Thread into one long-form Post per Yori's call. | Flagship-2: v2 position unchanged, gates unaffected by later data-reliability corrections (a misread automation success-rate number never reached the draft) — still awaiting Yori platform confirmation. Twitter Post: final copy approved by Yori 2026-07-27; visuals in progress (cards 1/2/4 done, real Helio screen-recording pending for beat 3) |
 
 ---
 
 ## Changelog
 
+- **v22** (2026-07-27 JST): Delta-fold over v21 (base sha 72845003), five blocks, everything else v21-verbatim. (1) Pattern 38 — competitor-safe comparative framing: never name a direct competitor (generic category descriptor instead), no absolute/idealized claims, and no screenshot/mimicry of a competing product's real UI in pain-point visuals. (2) Pattern 39 — person consistency across beats + Thread-to-Post format gate. (3) OAA↔SEO Genius Coordination: page-architecture rule (one search intent, one page). (4) Five new Red lines (forum-sourcing attribution ban, competitor naming, absolute claims, automation reliability numbers, competitor-UI visuals). (5) Content log 2026-07-27 row. Data gate: competitor product name removed from Pattern 38's own bad example and replaced with a placeholder; raw active-user count kept out of the Content log row (qualitative only), consistent with v18/v20. No changes to Patterns 28–37, Topic Selection Rules, Approved/Retired Patterns, Case Pools, Window Data, or any prior Content log row.
 - **v21** (2026-07-26 JST): Delta-fold over v20 (base sha 80630933), de-identification only, everything else v20-verbatim. (1) Raw automation ID removed from both places it appeared — the Pattern 33 intro line and the OAA automation fields block — replaced with a runtime-lookup note: a versioned skill file carries no value whose truth lives in a running system. (2) Content log 2026-07-19 artifact URL converted to title + seq pointer (org-gated link in a public-repo file is provenance, not an intentionally shared artifact). (3) Raw channel-id URIs in the workflow step and the v6 changelog line replaced with plain channel-name text — same class as the automation ID: internal plumbing does not belong in a public-repo file. (4) The digest cadence time dropped from the workflow step; the step's instruction is to wait for the digest, and the schedule itself lives in the automation. No content-direction changes; no changes to Patterns 28–37, Topic Selection Rules, Approved/Retired Patterns, Case Pools, Window Data, Red lines, or any other Content log row.
 - **v20** (2026-07-25 JST): Delta-fold over v19 (base sha c0ab015d), two blocks, everything else v19-verbatim. (1) New Window Raw Data 7/18–24: 数据/报表/看板 candidate sliced and eliminated (below threshold; no common reader across three unrelated domains); skill/agent re-sliced and reconfirmed eliminated (below threshold, two windows running now); 规划/管理 base bucket softened, flagship slice unaffected. Bucket percentages, active-user count, and slice ratios kept qualitative per Pattern 32 / data gate. (2) Content log 2026-07-25 row. No changes to Patterns 28–37, Topic Selection Rules, Approved/Retired Patterns, Case Pools, prior Window Data, or Red lines.
 - **v19** (2026-07-24 JST): Delta-fold over v18 (base sha 54b94f1f), two blocks, everything else v18-verbatim. (1) New Window Raw Data 7/17–23: 搭后台/CMS A/B/C slice confirmed elimination (persona mismatch, A-slice below flagship threshold, consistent with 7/20), 数据/脚本自动化 flagged as next candidate (slice pending). (2) Content log 2026-07-24 row. No changes to Patterns 28–37, Topic Selection Rules, Approved/Retired Patterns, Case Pools, prior Window Data, or Red lines.
