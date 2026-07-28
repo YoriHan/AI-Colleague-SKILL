@@ -24,6 +24,34 @@ REPORTING RULES (Trace 4906):
 import re, sys, unicodedata
 
 CRITERIA_VERSION = "shape-1.0.0"
+ANNOTATION_REV = "r2"   # annotations only; CRITERIA_VERSION deliberately NOT bumped
+                        # so results stay comparable across r1/r2 (Trace 5241).
+
+# ---------------------------------------------------------------------------
+# KNOWN-FP SOURCES -- adjudicated, NOT narrowed (Trace 5241).
+#
+#   "session"  : in this org's corpus this overwhelmingly means an agent RUNTIME
+#                session, not an analytics session.
+#   "queries"  : here it usually means "count of candidate query terms" in
+#                planning text, not a measured query volume.
+#
+# Evidence (Gatlin, 2026-07-28): 21 HARD candidates across the two SKILL.md
+# files adjudicated -> 0 measurement values; these two tokens were the dominant
+# driver. Same turn, they also tripped a zero-metric channel inventory and the
+# gate-report message itself -- three self-trips, one driver.
+#
+# NOT narrowed here on purpose. A unilateral narrowing inside a shared script is
+# the move that keeps costing us (cf. the same-line-metric conjunction that was
+# measured as a false-negative surface). Proposal pending criteria review:
+# require these two to co-occur with analytics context (impressions/clicks/ctr/
+# position). GSC Performance does not use either word, so GSC coverage would not
+# regress -- but that is a REVIEW decision, not a maintainer decision.
+#
+# Until then: treat HARD hits driven solely by these tokens as candidates with a
+# known-FP source. Adjudicate; do not auto-pass, and do not silently suppress.
+# ---------------------------------------------------------------------------
+KNOWN_FP_SOURCES = ("session", "queries")   # annotation only -- not used in matching
+
 
 # Metric vocabulary. NOT sensitive: these are measurement nouns, not data words.
 METRIC = [
