@@ -24,7 +24,7 @@ REPORTING RULES (Trace 4906):
 import re, sys, unicodedata
 
 CRITERIA_VERSION = "shape-1.0.0"
-ANNOTATION_REV = "r3"   # annotations only; CRITERIA_VERSION deliberately NOT bumped
+ANNOTATION_REV = "r4"   # annotations only; CRITERIA_VERSION deliberately NOT bumped
                         # so results stay comparable across r1/r2 (Trace 5241).
 
 # ---------------------------------------------------------------------------
@@ -79,7 +79,7 @@ def flatten(s: str) -> str:
     return s
 
 
-def candidates(text: str, artifact: str = "-"):
+def candidates(text: str, artifact: str = "-", blob_sha: str = "UNPINNED"):
     """Yield ledger rows: stable candidate_id + criterion, NEVER the matched value.
 
     candidate_id = <artifact>#L<line>:<criterion>  -- line-anchored and content-free,
@@ -97,15 +97,33 @@ def candidates(text: str, artifact: str = "-"):
             nums = NUM_RE.findall(probe)
             if not nums:
                 continue
-            hit = METRIC_RE.search(probe).group(0).lower()
-            rows.append({
-                "candidate_id": f"{artifact}#L{i}:HARD_metric_value",
-                "source_artifact": artifact,
-                "criterion": f"HARD_metric_value/{CRITERIA_VERSION}",
-                "pass": variant_name,
-                "metric_token": hit,                      # vocabulary, not data
-                "known_fp_source": hit in KNOWN_FP_SOURCES,
-            })
+            # scan_text() counts a line in BOTH tiers when it qualifies for both,
+            # so candidates() must emit one row per qualifying tier -- otherwise the
+            # rows-vs-counts invariant SEO 5384(1) verified (1109/1109) silently breaks.
+            tiers = ["HARD_metric_value"]
+            if len(TICK_RE.findall(line)) >= 2:
+                tiers.append("SOFT_ticked_metric")
+            # SEO 5384(2): using only the FIRST metric match pre-labels lines that
+            # ALSO carry a real metric word as "probably noise" -- silent
+            # down-weighting, one layer inside the thing I said I would not do.
+            all_hits = [m.group(0).lower() for m in METRIC_RE.finditer(probe)]
+            hit = ",".join(sorted(set(all_hits)))
+            only_fp = all(h in KNOWN_FP_SOURCES for h in all_hits)
+            for tier in tiers:
+              rows.append({
+                  # Trace 5347: a line anchor is only valid ON A GIVEN BLOB, so the
+                  # blob sha and the criteria/annotation revs are part of the id,
+                  # not metadata beside it. UNPINNED is a loud default, not a blank.
+                  "candidate_id": (f"{artifact}@{blob_sha}#L{i}"
+                                 f":{tier}:{CRITERIA_VERSION}+{ANNOTATION_REV}"),
+                  "source_artifact": artifact,
+                  "blob_sha": blob_sha,
+                  "expires_or_version": f"valid-only-on blob {blob_sha}; criteria {CRITERIA_VERSION}; annot {ANNOTATION_REV}",
+                  "criterion": f"{tier}/{CRITERIA_VERSION}",
+                  "pass": variant_name,
+                  "metric_token": hit,                      # vocabulary, not data
+                  "known_fp_source": only_fp,   # ALL matches on the line, not just the first
+              })
     seen, out = set(), []
     for r in rows:
         if r["candidate_id"] in seen:
@@ -138,6 +156,9 @@ def main(argv):
         print("usage: gate19_shape.py <file> [file ...]   (or - for stdin)")
         return 64
     ledger = "--ledger" in argv
+    blob_sha = "UNPINNED"
+    if "--blob" in argv:
+        i = argv.index("--blob"); blob_sha = argv[i + 1]; del argv[i:i + 2]
     argv = [a for a in argv if a != "--ledger"]
     worst = 0
     print(f"# gate19_shape {CRITERIA_VERSION} annot={ANNOTATION_REV} -- SHAPE family only")
@@ -145,8 +166,8 @@ def main(argv):
     for path in argv[1:]:
         text = sys.stdin.read() if path == "-" else open(path, encoding="utf-8", errors="replace").read()
         if ledger:
-            for r in candidates(text, path):
-                print(f"{r['candidate_id']} | {r['criterion']} | pass={r['pass']} "
+            for r in candidates(text, path, blob_sha):
+                print(f"{r['candidate_id']} | pass={r['pass']} "
                       f"| metric_token={r['metric_token']} | known_fp_source={r['known_fp_source']}")
         d = scan_text(text)
         for tier, n in d.items():          # every door reported, including empty
