@@ -32,8 +32,18 @@ CONTRACT
                            show/get only, no seq, no version history
   Unknown verb -> (surface='unknown', fields=[]). Callers MUST treat that as
   UNMEASURED, never as clean -- same rule the shape gate prints about its own
-  blind half. A verb known but with a field missing yields text=None for that
-  field, which is also UNMEASURED, not zero.
+  blind half.
+
+  COVERAGE, per field, because "0 chars" has three different meanings
+  (Gatlin 6358, Trace 6363 -- a payload face that reached zero must not read
+  like a face that was scanned and found clean):
+      OK             text is present and non-empty
+      PAYLOAD-EMPTY  the field exists in the argv but carries no characters
+      ABSENT         the field is not in the argv at all
+  PAYLOAD-EMPTY and ABSENT are both UNMEASURED. The exit code says so: any
+  field not OK makes the run exit non-zero. An earlier version printed
+  "absent fields: 1" and still exited 0 -- the rule was in the docstring and
+  not in the code, which is the failure this whole file exists to prevent.
 
 CLI output is content-free: path, surface, field, face, char count.
 """
@@ -123,7 +133,13 @@ def extract(argv):
             text = pos[sel] if sel < len(pos) and isinstance(pos[sel], str) else None
         else:
             text = _flag_value(argv, sel)
-        fields.append({"field": label, "face": face, "text": text})
+        if text is None:
+            cov = "ABSENT"
+        elif not str(text).strip():
+            cov = "PAYLOAD-EMPTY"
+        else:
+            cov = "OK"
+        fields.append({"field": label, "face": face, "text": text, "coverage": cov})
     return (surface, fields)
 
 
@@ -149,6 +165,9 @@ _CONTROLS = [
     (["document", "edit", "x", "--old", "O", "--new", "N"], "document_edit", "old", "O"),
     (["document", "edit", "x", "--old", "O", "--new", "N"], "document_edit", "new", "N"),
     (["document", "seed", "x", "--content", "B"], "document_seed", "content", "B"),
+    # coverage controls: "0 chars" must not be able to look like "scanned, clean"
+    (["message", "send", "#c", "", "--seen", "1"], "message_send", "body", ""),
+    (["message", "cede", "#c", "--seen", "1"], "message_cede", "reason", None),
     (["task", "list"], "unknown", None, None),
     (["totally", "madeup"], "unknown", None, None),
 ]
@@ -158,8 +177,13 @@ def selftest():
     bad = 0
     for argv, exp_surface, exp_field, exp_text in _CONTROLS:
         surface, fields = extract(argv)
-        got = next((f["text"] for f in fields if f["field"] == exp_field), None) if exp_field else None
+        fld = next((f for f in fields if f["field"] == exp_field), None) if exp_field else None
+        got = fld["text"] if fld else None
         ok = surface == exp_surface and got == exp_text
+        # coverage must agree with the text: empty -> PAYLOAD-EMPTY, missing -> ABSENT
+        if fld is not None:
+            want = "ABSENT" if got is None else ("PAYLOAD-EMPTY" if not str(got).strip() else "OK")
+            ok = ok and fld["coverage"] == want
         if not ok:
             bad += 1
             print(f"FAIL  {' '.join(argv[:3])}  surface={surface} {exp_field}={got!r}")
@@ -173,27 +197,32 @@ def main(argv):
     if len(argv) < 2:
         print(__doc__)
         return 64
-    print(f"{'artifact':34s} {'surface':15s} {'field':12s} {'face':10s} {'chars':>6s}")
+    print(f"{'artifact':32s} {'surface':15s} {'field':11s} {'face':10s} "
+          f"{'chars':>6s}  coverage")
     unknown = unmeasured = 0
     for p in argv[1:]:
         try:
             a = json.load(open(p, encoding="utf-8"))
         except Exception:
-            print(f"{p:34s} {'unparsed':15s} {'-':12s} {'-':10s} {'-':>6s}")
+            print(f"{p:32s} {'unparsed':15s} {'-':11s} {'-':10s} {'-':>6s}  UNPARSED")
             unknown += 1
             continue
         surface, fields = extract(a)
         if surface == "unknown":
             unknown += 1
-            print(f"{p:34s} {surface:15s} {'-':12s} {'-':10s} {'-':>6s}")
+            print(f"{p:32s} {surface:15s} {'-':11s} {'-':10s} {'-':>6s}  UNKNOWN-VERB")
             continue
         for f in fields:
-            if f["text"] is None:
+            if f["coverage"] != "OK":
                 unmeasured += 1
-            print(f"{p:34s} {surface:15s} {f['field']:12s} {f['face']:10s} "
-                  f"{len(f['text']) if f['text'] else 0:>6d}")
-    print(f"# unknown verb / unparsed: {unknown}   absent fields (UNMEASURED, not zero): {unmeasured}")
-    return 1 if unknown else 0
+            print(f"{p:32s} {surface:15s} {f['field']:11s} {f['face']:10s} "
+                  f"{len(f['text']) if f['text'] else 0:>6d}  {f['coverage']}")
+    print(f"# unknown verb / unparsed: {unknown}   "
+          f"fields not OK (UNMEASURED, not clean): {unmeasured}")
+    if unmeasured:
+        print("# a PAYLOAD-EMPTY / ABSENT field was NOT scanned-and-clean; do not "
+              "record it as clean", file=sys.stderr)
+    return 1 if (unknown or unmeasured) else 0
 
 
 if __name__ == "__main__":
