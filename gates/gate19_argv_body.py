@@ -128,6 +128,11 @@ def extract(argv):
 
 
 _CONTROLS = [
+    # (argv, surface, field, expected_text) -- EVERY dispatch row has one.
+    # Three rows shipped without a control at first (task comments update,
+    # task done, document create). All three turned out correct when read off
+    # `--help`, but "correct and unmeasured" is not a state this file is allowed
+    # to ship: an untested row reads exactly like a tested one from the outside.
     # (argv, surface, field, expected_text) -- every dispatch row has one,
     # including the rows no local corpus exercises. Reindexing the positional
     # origin once shifted every int row by one and only these caught it.
@@ -138,6 +143,9 @@ _CONTROLS = [
     (["task", "update", "U3-1", "--title", "T", "-d", "D"], "task_update", "description", "D"),
     (["task", "update", "U3-1", "--title", "T", "-d", "D"], "task_update", "title", "T"),
     (["task", "comments", "add", "U3-1", "C"], "task_comments_add", "comment", "C"),
+    (["task", "comments", "update", "U3-1", "cid", "C2"], "task_comments_update", "comment", "C2"),
+    (["task", "done", "U3-1", "--comment", "EV"], "task_done", "evidence", "EV"),
+    (["document", "create", "--content", "B", "--channel", "#c"], "document_create", "content", "B"),
     (["document", "edit", "x", "--old", "O", "--new", "N"], "document_edit", "old", "O"),
     (["document", "edit", "x", "--old", "O", "--new", "N"], "document_edit", "new", "N"),
     (["document", "seed", "x", "--content", "B"], "document_seed", "content", "B"),
