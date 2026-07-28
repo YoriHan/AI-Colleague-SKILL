@@ -78,6 +78,15 @@ def _norm_token(tok: str) -> str:
 # `composition`. Half a list guarded and half not, inside one declaration.
 # Every ASCII alternative is now boundary-wrapped once, centrally, so the next
 # vocabulary entry cannot inherit the omission.
+#
+# DO NOT 'simplify' this to \b. \b is Unicode-aware, so it treats CJK as word
+# characters: in mixed CJK/ASCII prose an ASCII metric token sitting flush
+# against Chinese text would NOT match under \b, and this corpus is mixed
+# throughout -- i.e. \b is a SILENT under-detection here, measured on a real
+# corpus, not hypothetical. The explicit [A-Za-z0-9_] adjacency exclusion is
+# deliberate for that reason. (Recorded because the choice was originally
+# inherited from an earlier rule rather than re-derived in this patch -- an
+# undocumented correct choice is one refactor away from being undone.)
 # This is a CRITERIA change: shape-1.0.0 counts are superseded and NOT comparable.
 _ASCII_METRIC = [
     r"impressions?", r"imps?", r"clicks?", r"ctr", r"positions?", r"pos",
