@@ -23,8 +23,8 @@ REPORTING RULES (Trace 4906):
 """
 import re, sys, unicodedata
 
-CRITERIA_VERSION = "shape-1.0.0"
-ANNOTATION_REV = "r5"   # annotations only; CRITERIA_VERSION deliberately NOT bumped
+CRITERIA_VERSION = "shape-1.1.0"
+ANNOTATION_REV = "r6"   # annotations only; CRITERIA_VERSION deliberately NOT bumped
                         # so results stay comparable across r1/r2 (Trace 5241).
 
 # ---------------------------------------------------------------------------
@@ -56,7 +56,8 @@ KNOWN_FP_SOURCES = ("session", "queries")   # canonical singular forms; annotati
 def _norm_token(tok: str) -> str:
     """Normalise a matched metric token to its canonical form for FP lookup.
 
-    SEO 5471(4): METRIC_RE matches `sessions?`, so the plural surfaced as
+    SEO (see channel record, plural-form residual): METRIC_RE matches the
+    inflected form, so the plural surfaced as
     "sessions" and missed the singular-only tuple -- lines whose ONLY metric
     word was the plural went unflagged. Direction was safe (under-labelling,
     not pre-down-weighting), but the flag's coverage was SILENTLY incomplete,
@@ -71,12 +72,21 @@ def _norm_token(tok: str) -> str:
 
 
 # Metric vocabulary. NOT sensitive: these are measurement nouns, not data words.
-METRIC = [
-    r"impressions?", r"\bimps?\b", r"clicks?", r"\bctr\b", r"positions?", r"\bpos\b",
-    r"\bavg\.?\s*pos", r"impr\.", r"queries", r"sessions?", r"visitors?", r"pageviews?",
-    r"曝光", r"点击", r"均位", r"展现", r"排名", r"访客", r"浏览量", r"点击率",
+# shape-1.1.0 (Trace 5711): ASCII alternatives had INCONSISTENT word boundaries --
+# `\bimps?\b` and `\bpos\b` were guarded, `positions?` / `sessions?` / `clicks?` /
+# `ctr` / `queries` were not, so `position` matched inside `disposition` and
+# `composition`. Half a list guarded and half not, inside one declaration.
+# Every ASCII alternative is now boundary-wrapped once, centrally, so the next
+# vocabulary entry cannot inherit the omission.
+# This is a CRITERIA change: shape-1.0.0 counts are superseded and NOT comparable.
+_ASCII_METRIC = [
+    r"impressions?", r"imps?", r"clicks?", r"ctr", r"positions?", r"pos",
+    r"avg\.?\s*pos", r"impr\.", r"queries", r"sessions?", r"visitors?", r"pageviews?",
 ]
-METRIC_RE = re.compile("|".join(METRIC), re.I)
+_CJK_METRIC = [r"曝光", r"点击率", r"点击", r"均位", r"展现", r"排名", r"访客", r"浏览量"]
+METRIC_RE = re.compile(
+    r"(?<![A-Za-z0-9_])(?:" + "|".join(_ASCII_METRIC) + r")(?![A-Za-z0-9_])"
+    + "|" + "|".join(_CJK_METRIC), re.I)
 
 # Bare numeric token: not part of an identifier, version, sha, or date fragment.
 NUM_RE = re.compile(r"(?<![A-Za-z0-9._/-])\d[\d,]*(?:\.\d+)?%?(?![A-Za-z0-9_./-])")
