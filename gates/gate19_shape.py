@@ -24,7 +24,7 @@ REPORTING RULES (Trace 4906):
 import re, sys, unicodedata
 
 CRITERIA_VERSION = "shape-1.0.0"
-ANNOTATION_REV = "r2"   # annotations only; CRITERIA_VERSION deliberately NOT bumped
+ANNOTATION_REV = "r3"   # annotations only; CRITERIA_VERSION deliberately NOT bumped
                         # so results stay comparable across r1/r2 (Trace 5241).
 
 # ---------------------------------------------------------------------------
@@ -79,6 +79,41 @@ def flatten(s: str) -> str:
     return s
 
 
+def candidates(text: str, artifact: str = "-"):
+    """Yield ledger rows: stable candidate_id + criterion, NEVER the matched value.
+
+    candidate_id = <artifact>#L<line>:<criterion>  -- line-anchored and content-free,
+    so it can be written into the adjudication ledger (Trace 5269) without the
+    ledger itself becoming a disclosure surface. NOTE the id is line-anchored, so
+    it is only stable while the artifact's line numbering is; pin it with a blob
+    sha / version in `expires_or_version`.
+    """
+    rows = []
+    for variant_name, variant in (("raw", text), ("flat", flatten(text))):
+        for i, line in enumerate(variant.splitlines(), 1):
+            probe = PROVENANCE_RE.sub(" ", line)
+            if not METRIC_RE.search(probe):
+                continue
+            nums = NUM_RE.findall(probe)
+            if not nums:
+                continue
+            hit = METRIC_RE.search(probe).group(0).lower()
+            rows.append({
+                "candidate_id": f"{artifact}#L{i}:HARD_metric_value",
+                "source_artifact": artifact,
+                "criterion": f"HARD_metric_value/{CRITERIA_VERSION}",
+                "pass": variant_name,
+                "metric_token": hit,                      # vocabulary, not data
+                "known_fp_source": hit in KNOWN_FP_SOURCES,
+            })
+    seen, out = set(), []
+    for r in rows:
+        if r["candidate_id"] in seen:
+            continue
+        seen.add(r["candidate_id"]); out.append(r)
+    return out
+
+
 def scan_text(text: str):
     """Return {tier: count}. Two-pass: raw + flattened, deduped by line index."""
     doors = {"HARD_metric_value": set(), "SOFT_ticked_metric": set()}
@@ -102,11 +137,17 @@ def main(argv):
     if len(argv) < 2:
         print("usage: gate19_shape.py <file> [file ...]   (or - for stdin)")
         return 64
+    ledger = "--ledger" in argv
+    argv = [a for a in argv if a != "--ledger"]
     worst = 0
-    print(f"# gate19_shape {CRITERIA_VERSION} -- SHAPE family only")
+    print(f"# gate19_shape {CRITERIA_VERSION} annot={ANNOTATION_REV} -- SHAPE family only")
     print("# lexicon_result: NOT MEASURED by this tool. A PASS here is not 'clean'.")
     for path in argv[1:]:
         text = sys.stdin.read() if path == "-" else open(path, encoding="utf-8", errors="replace").read()
+        if ledger:
+            for r in candidates(text, path):
+                print(f"{r['candidate_id']} | {r['criterion']} | pass={r['pass']} "
+                      f"| metric_token={r['metric_token']} | known_fp_source={r['known_fp_source']}")
         d = scan_text(text)
         for tier, n in d.items():          # every door reported, including empty
             print(f"{path} -- {tier} -- {n}")
