@@ -49,34 +49,49 @@ import json, sys
 # the corpus it was written against). Guessing a field's role from its content
 # is the same sin as guessing it from its length.
 _DISPATCH = {
-    ("message", "send"):    [(1,               "body",        "delivered")],
-    ("message", "cede"):    [("--reason",      "reason",      "metadata")],
-    ("task", "create"):     [(0,               "title",       "surface"),
-                             ("--description", "description", "surface")],
-    ("task", "update"):     [("--description", "description", "surface"),
-                             ("--title",       "title",       "surface")],
-    ("task", "comment"):    [(1,               "comment",     "surface")],
-    ("document", "edit"):   [("--old",         "old",         "surface"),
-                             ("--new",         "new",         "surface")],
-    ("document", "append"): [("--text",        "text",        "surface")],
+    # verified against `heliox <verb> --help` on 2026-07-28, not inferred.
+    ("message", "send"):            [(3,                     "body",        "delivered")],
+    ("message", "cede"):            [(("--reason",),         "reason",      "metadata")],
+    ("task", "create"):             [(2,                     "title",       "surface"),
+                                     (("-d", "--description"), "description", "surface")],
+    ("task", "update"):             [(("-d", "--description"), "description", "surface"),
+                                     (("--title",),          "title",       "surface")],
+    ("task", "comments", "add"):    [(4,                     "comment",     "surface")],
+    ("task", "comments", "update"): [(5,                     "comment",     "surface")],
+    ("task", "done"):               [(("--comment", "-c"),   "evidence",    "surface")],
+    ("document", "edit"):           [(("--old",),            "old",         "surface"),
+                                     (("--new",),            "new",         "surface")],
+    ("document", "create"):         [(("--content",),        "content",     "surface")],
+    ("document", "seed"):           [(("--content",),        "content",     "surface")],
 }
 
-_VALUE_FLAGS = {"--reason", "--description", "--title", "--old", "--new",
-                "--text", "--thread", "--seen", "--in-reply-to", "-a",
-                "--attachment"}
+
+_VALUE_FLAGS = {"--reason", "--description", "-d", "--title", "--old", "--new",
+                "--content", "--comment", "-c", "--thread", "--seen",
+                "--in-reply-to", "-a", "--attachment", "--channel", "--assignee",
+                "--deadline", "--labels", "--priority", "--status", "--collab-url"}
 
 
-def _flag_value(argv, flag):
+def _flag_value(argv, flags):
+    """flags is a tuple of aliases -- `-d` and `--description` are the same field."""
     for i, a in enumerate(argv[:-1]):
-        if a == flag:
+        if a in flags:
             return argv[i + 1]
     return None
 
 
 def _positionals(argv):
-    """Positional elements after the verb, in order. Flags and their values removed."""
+    """Positional elements, in order, from argv[0]. Flags and their values removed.
+
+    Indices in _DISPATCH are absolute over positionals INCLUDING the verb tokens,
+    so `message send #chan BODY` puts BODY at 3 and `task comments add REF BODY`
+    puts BODY at 4. One origin, no per-arity offset -- but it means every index
+    in the table must be counted from argv[0]. Changing this origin once already
+    shifted every row by one; the synthetic controls below are what caught it,
+    which is why rows the local corpus never exercises still need controls.
+    """
     out, skip = [], False
-    for a in argv[2:]:
+    for a in argv:
         if skip:
             skip = False
             continue
@@ -91,10 +106,16 @@ def _positionals(argv):
 def extract(argv):
     if not isinstance(argv, list) or len(argv) < 2:
         return ("unknown", [])
-    key = (str(argv[0]), str(argv[1]))
-    if key not in _DISPATCH:
+    # longest verb prefix wins: `task comments add` before `task comments`.
+    key = None
+    for n in (3, 2):
+        cand = tuple(str(x) for x in argv[:n])
+        if cand in _DISPATCH:
+            key = cand
+            break
+    if key is None:
         return ("unknown", [])
-    surface = f"{key[0]}_{key[1]}"
+    surface = "_".join(key)
     pos = _positionals(argv)
     fields = []
     for sel, label, face in _DISPATCH[key]:
@@ -106,7 +127,41 @@ def extract(argv):
     return (surface, fields)
 
 
+_CONTROLS = [
+    # (argv, surface, field, expected_text) -- every dispatch row has one,
+    # including the rows no local corpus exercises. Reindexing the positional
+    # origin once shifted every int row by one and only these caught it.
+    (["message", "send", "#c", "BODY", "--seen", "1"], "message_send", "body", "BODY"),
+    (["message", "cede", "#c", "--reason", "R", "--seen", "1"], "message_cede", "reason", "R"),
+    (["task", "create", "T", "-d", "D"], "task_create", "title", "T"),
+    (["task", "create", "T", "-d", "D"], "task_create", "description", "D"),
+    (["task", "update", "U3-1", "--title", "T", "-d", "D"], "task_update", "description", "D"),
+    (["task", "update", "U3-1", "--title", "T", "-d", "D"], "task_update", "title", "T"),
+    (["task", "comments", "add", "U3-1", "C"], "task_comments_add", "comment", "C"),
+    (["document", "edit", "x", "--old", "O", "--new", "N"], "document_edit", "old", "O"),
+    (["document", "edit", "x", "--old", "O", "--new", "N"], "document_edit", "new", "N"),
+    (["document", "seed", "x", "--content", "B"], "document_seed", "content", "B"),
+    (["task", "list"], "unknown", None, None),
+    (["totally", "madeup"], "unknown", None, None),
+]
+
+
+def selftest():
+    bad = 0
+    for argv, exp_surface, exp_field, exp_text in _CONTROLS:
+        surface, fields = extract(argv)
+        got = next((f["text"] for f in fields if f["field"] == exp_field), None) if exp_field else None
+        ok = surface == exp_surface and got == exp_text
+        if not ok:
+            bad += 1
+            print(f"FAIL  {' '.join(argv[:3])}  surface={surface} {exp_field}={got!r}")
+    print(f"# selftest: {len(_CONTROLS) - bad} pass / {bad} fail")
+    return 1 if bad else 0
+
+
 def main(argv):
+    if "--selftest" in argv:
+        return selftest()
     if len(argv) < 2:
         print(__doc__)
         return 64
