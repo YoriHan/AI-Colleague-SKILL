@@ -24,7 +24,7 @@ REPORTING RULES (Trace 4906):
 import re, sys, unicodedata
 
 CRITERIA_VERSION = "shape-1.0.0"
-ANNOTATION_REV = "r4"   # annotations only; CRITERIA_VERSION deliberately NOT bumped
+ANNOTATION_REV = "r5"   # annotations only; CRITERIA_VERSION deliberately NOT bumped
                         # so results stay comparable across r1/r2 (Trace 5241).
 
 # ---------------------------------------------------------------------------
@@ -50,7 +50,24 @@ ANNOTATION_REV = "r4"   # annotations only; CRITERIA_VERSION deliberately NOT bu
 # Until then: treat HARD hits driven solely by these tokens as candidates with a
 # known-FP source. Adjudicate; do not auto-pass, and do not silently suppress.
 # ---------------------------------------------------------------------------
-KNOWN_FP_SOURCES = ("session", "queries")   # annotation only -- not used in matching
+KNOWN_FP_SOURCES = ("session", "queries")   # canonical singular forms; annotation only
+
+
+def _norm_token(tok: str) -> str:
+    """Normalise a matched metric token to its canonical form for FP lookup.
+
+    SEO 5471(4): METRIC_RE matches `sessions?`, so the plural surfaced as
+    "sessions" and missed the singular-only tuple -- lines whose ONLY metric
+    word was the plural went unflagged. Direction was safe (under-labelling,
+    not pre-down-weighting), but the flag's coverage was SILENTLY incomplete,
+    and "silently" is the property this whole exercise exists to remove.
+    Normalising is preferred over listing both forms: the next vocabulary
+    entry with a plural inflection is then covered without a second patch.
+    """
+    t = tok.strip().lower()
+    if t.endswith("s") and t[:-1] in KNOWN_FP_SOURCES:
+        return t[:-1]
+    return t
 
 
 # Metric vocabulary. NOT sensitive: these are measurement nouns, not data words.
@@ -108,7 +125,7 @@ def candidates(text: str, artifact: str = "-", blob_sha: str = "UNPINNED"):
             # down-weighting, one layer inside the thing I said I would not do.
             all_hits = [m.group(0).lower() for m in METRIC_RE.finditer(probe)]
             hit = ",".join(sorted(set(all_hits)))
-            only_fp = all(h in KNOWN_FP_SOURCES for h in all_hits)
+            only_fp = all(_norm_token(h) in KNOWN_FP_SOURCES for h in all_hits)
             for tier in tiers:
               rows.append({
                   # Trace 5347: a line anchor is only valid ON A GIVEN BLOB, so the
