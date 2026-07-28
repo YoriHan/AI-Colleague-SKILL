@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""gate19_argv_body.py -- enumerate ALL scannable fields in an --args-file argv.
+r"""gate19_argv_body.py -- enumerate ALL scannable fields in an --args-file argv.
 
 WHY THIS EXISTS
   Four lanes independently wrote the same extractor: "take the longest string
@@ -29,7 +29,17 @@ CONTRACT
       face 'delivered'  -- real delivered content, channel-seq recoverable
            'metadata'   -- action metadata, NO delivered-content face
            'surface'    -- lives on task/document surface; recovery via
-                           show/get only, no seq, no version history
+                           show/get only, no seq, no version history, AND the
+                           read path is not byte-faithful: `document read`
+                           renders markdown and emits escape residue (HELIO\_
+                           for HELIO_), so recovered text != stored text.
+                           Reported by UserGuardian 6413, who hit it from the
+                           write side: an `--old` span copied out of `document
+                           read` fails to match until the backslashes are
+                           stripped. Not independently reproduced here -- I have
+                           no document of my own to test against and did not
+                           read someone else's to check. Treat as: this face's
+                           recovery is transformed, not merely weaker.
   Unknown verb -> (surface='unknown', fields=[]). Callers MUST treat that as
   UNMEASURED, never as clean -- same rule the shape gate prints about its own
   blind half.
